@@ -21,22 +21,27 @@ BIT             := $(VIVADO_PROJ_DIR)/$(PROJ_NAME).runs/impl_1/$(TOP).bit
 
 bitstream: $(BIT)
 
+# -log/-journal keep Vivado's own log and journal inside the build dir
+# instead of littering the module root (they're vendored per-invocation, not
+# per-project, so they can't just live next to the .xpr on their own).
+VIVADO_LOG_ARGS = -log $(VIVADO_PROJ_DIR)/vivado.log -journal $(VIVADO_PROJ_DIR)/vivado.jou
+
 $(BIT) $(XPR) &: $(SRC_V) $(XDC)
 	@if [ -z "$(strip $(SRC_V))" ]; then echo "ERROR: SRC_V is empty - no HDL sources found"; exit 1; fi
 	@if [ -z "$(strip $(XDC))" ]; then echo "ERROR: XDC is empty - no constraints found for BOARD=$(BOARD)"; exit 1; fi
 	mkdir -p $(VIVADO_PROJ_DIR)
-	$(VIVADO) -mode batch -source $(COMMON_TCL_DIR)/build_project.tcl \
+	$(VIVADO) -mode batch $(VIVADO_LOG_ARGS) -source $(COMMON_TCL_DIR)/build_project.tcl \
 		-tclargs $(PROJ_NAME) $(FPGA_PART) $(VIVADO_PROJ_DIR) "$(SRC_V)" "$(XDC)" $(TOP) "$(BOARD_PART)"
 
 synth: $(XPR)
-	$(VIVADO) -mode batch -source $(COMMON_TCL_DIR)/build_project.tcl \
+	$(VIVADO) -mode batch $(VIVADO_LOG_ARGS) -source $(COMMON_TCL_DIR)/build_project.tcl \
 		-tclargs $(PROJ_NAME) $(FPGA_PART) $(VIVADO_PROJ_DIR) "$(SRC_V)" "$(XDC)" $(TOP) "$(BOARD_PART)" synth_only
 
 gui: $(XPR)
 	$(VIVADO) $(XPR) &
 
 program: $(BIT)
-	$(VIVADO) -mode batch -source $(COMMON_TCL_DIR)/program.tcl -tclargs $(BIT)
+	$(VIVADO) -mode batch $(VIVADO_LOG_ARGS) -source $(COMMON_TCL_DIR)/program.tcl -tclargs $(BIT)
 
 clean:
 	rm -rf $(OUT_DIR)

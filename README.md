@@ -5,7 +5,7 @@ basic digital logic through Zynq PS bring-up, embedded Linux, HLS/DSP, and
 RF data converters - targeting three real boards:
 
 - **Digilent Nexys4** (Artix-7, `xc7a100tcsg324-1`) - pure-fabric logic, no PS.
-- **RealDigital BlackBoard** (Zynq-7000, `xc7z007s-1clg400c`) - smallest Zynq
+- **RealDigital BlackBoard** (Zynq-7000, `xc7z007sclg400-1`) - smallest Zynq
   PS in the lineup.
 - **RealDigital RFSoC4x2** (Zynq UltraScale+ RFSoC, `xczu48dr-ffvg1517-2-e`) -
   RF data converters, high-speed I/O, the deep end.
