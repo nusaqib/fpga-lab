@@ -1,0 +1,44 @@
+# ---------------------------------------------------------------------------
+# Build artifacts: every Vivado/Vitis project, run, and log lives under an
+# `_out/` directory next to the sources that generated it. Nothing under
+# `_out/` is ever committed - it is fully regenerable via `make`.
+# ---------------------------------------------------------------------------
+_out/
+**/_out/
+
+# Vivado
+*.jou
+*.log
+*.str
+*.Xil
+.Xil/
+vivado*.jou
+vivado*.log
+vivado*.str
+webtalk*.jou
+webtalk*.log
+usage_statistics_webtalk.html
+usage_statistics_webtalk.xml
+.hbs
+*.backup.log
+*.zip.bak
+
+# Vitis / SDK
+.metadata/
+.analytics/
+*.launch
+
+# PetaLinux (large build trees, never vendored)
+**/petalinux_build/
+**/images/linux/
+**/build/tmp/
+
+# Editor / OS cruft
+.vscode/
+*.swp
+.DS_Store
+
+# Large vendored reference binaries fetched by scripts/fetch_vendor_files.sh
+# (re-fetch on demand instead of tracking in git history)
+boards/*/board_files/**/*.bit
+boards/*/docs/*.xsa
