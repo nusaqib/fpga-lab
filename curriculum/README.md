@@ -18,9 +18,10 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
 
 ## Tier 1 - Combinational logic
 
-- [ ] `01_combinational_logic` - gates, muxes, decoders, priority encoders in
+- [x] `01_combinational_logic` - gates, muxes, decoders, priority encoders in
   Verilog; `assign` vs always-block combinational style; simulation basics
-  (a testbench for the first time). Boards: all.
+  (a testbench for the first time - `make sim`/`sim-all` now exist, xvlog/
+  xelab/xsim, no project needed). Boards: all three, verified building.
 - [ ] `02_arithmetic_circuits` - adders (ripple-carry, then a look at
   carry-lookahead conceptually), comparators, ALU. Introduces `generate`.
 

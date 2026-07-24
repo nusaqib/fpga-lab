@@ -17,7 +17,22 @@ VIVADO_PROJ_DIR := $(OUT_DIR)/$(BOARD)/vivado
 XPR             := $(VIVADO_PROJ_DIR)/$(PROJ_NAME).xpr
 BIT             := $(VIVADO_PROJ_DIR)/$(PROJ_NAME).runs/impl_1/$(TOP).bit
 
-.PHONY: bitstream synth impl program gui clean distclean sim
+# --- Simulation (xsim, standalone - no project needed) ---------------------
+# Same "$@"-forwarding fix as VIVADO above.
+XVLOG := bash -c 'source $(VIVADO_SETTINGS) && exec xvlog "$$@"' xvlog
+XELAB := bash -c 'source $(VIVADO_SETTINGS) && exec xelab "$$@"' xelab
+XSIM  := bash -c 'source $(VIVADO_SETTINGS) && exec xsim "$$@"' xsim
+
+SIM_V   ?= $(wildcard sim/*.v)
+# Default to the first testbench found so `make sim` works with zero extra
+# arguments in the common case of one testbench per module; override with
+# `make SIM_TOP=tb_other_thing sim` when there's more than one.
+SIM_TOP ?= $(basename $(notdir $(firstword $(SIM_V))))
+SIM_DIR := $(OUT_DIR)/sim
+SIM_SRC_ABS := $(abspath $(SRC_V))
+SIM_TB_ABS  := $(abspath $(SIM_V))
+
+.PHONY: bitstream synth impl program gui clean distclean sim sim-all
 
 bitstream: $(BIT)
 
@@ -47,3 +62,29 @@ clean:
 	rm -rf $(OUT_DIR)
 
 distclean: clean
+
+# `make sim` (default testbench) or `make SIM_TOP=tb_other sim`. Compiles
+# every hdl/*.v + sim/*.v together (xvlog), elaborates just SIM_TOP (xelab),
+# then runs it to completion in batch mode (xsim -runall) - no waveform GUI,
+# no project, just compile/elaborate/run like the lesson describes. Fails
+# the build if the testbench printed "FAIL" anywhere (see sim/tb_*.v for the
+# self-checking convention this relies on).
+sim:
+	@if [ -z "$(strip $(SIM_TOP))" ]; then echo "ERROR: no sim/*.v testbenches found - add one, or set SIM_TOP=<module>"; exit 1; fi
+	mkdir -p $(SIM_DIR)
+	cd $(SIM_DIR) && $(XVLOG) -sv $(SIM_SRC_ABS) $(SIM_TB_ABS)
+	cd $(SIM_DIR) && $(XELAB) $(SIM_TOP) -s $(SIM_TOP)_sim --timescale 1ns/1ps
+	cd $(SIM_DIR) && ( $(XSIM) $(SIM_TOP)_sim -runall > $(SIM_TOP).sim.log 2>&1 || true )
+	@cat $(SIM_DIR)/$(SIM_TOP).sim.log
+	@if grep -qi "FAIL" $(SIM_DIR)/$(SIM_TOP).sim.log; then \
+		echo ">>> SIMULATION FAILED - see $(SIM_DIR)/$(SIM_TOP).sim.log"; exit 1; \
+	else \
+		echo ">>> Simulation PASSED ($(SIM_TOP))"; \
+	fi
+
+# Run every testbench under sim/ one at a time, stopping at the first failure.
+sim-all:
+	@for tb in $(basename $(notdir $(SIM_V))); do \
+		echo "=== $$tb ==="; \
+		$(MAKE) SIM_TOP=$$tb sim || exit 1; \
+	done

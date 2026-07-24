@@ -44,6 +44,15 @@ Other targets, run from inside the same module directory:
 | `make BOARD=<b> board-info` | prints the resolved part number / paths without building anything |
 | `make BOARD=<b> clean` | deletes that board's `_out/` for this module |
 | `make clean-all` (repo root) | runs `clean` in every module at once |
+| `make sim` | runs the module's default testbench (`sim/tb_*.v`) via `xvlog`/`xelab`/`xsim` - no board, no project |
+| `make SIM_TOP=tb_other sim` | runs a specific testbench when a module has more than one |
+| `make sim-all` | runs every testbench in `sim/`, stopping at the first failure |
+
+Simulation output lands in `_out/sim/` (board-independent - there's no
+`BOARD=` for `sim`, since a behavioral testbench doesn't need a part/board at
+all). See `curriculum/01_combinational_logic/` for the first module using
+this - it also documents the self-checking testbench convention (`$display`
+a `PASS`/`FAIL` line `make sim` greps for).
 
 Since artifacts are gitignored and regenerated on demand, `git status` should
 always be clean of `_out/` content, `.xpr` files, or `.bit` files - if you see
