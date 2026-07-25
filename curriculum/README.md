@@ -22,8 +22,11 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   Verilog; `assign` vs always-block combinational style; simulation basics
   (a testbench for the first time - `make sim`/`sim-all` now exist, xvlog/
   xelab/xsim, no project needed). Boards: all three, verified building.
-- [ ] `02_arithmetic_circuits` - adders (ripple-carry, then a look at
-  carry-lookahead conceptually), comparators, ALU. Introduces `generate`.
+- [~] `02_arithmetic_circuits` - adders (ripple-carry, then a concrete
+  carry-lookahead adder cross-checked against it), comparators, ALU.
+  Introduces `generate`. All designs simulation-verified; hardware
+  bitstream builds still pending (blocked mid-session by a recurring Vivado
+  licensing error - see the module's own README "Board status").
 
 ## Tier 2 - Sequential logic & clocking
 
