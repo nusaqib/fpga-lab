@@ -105,14 +105,8 @@ switch left over once two 2-bit operands are wired up. What to try:
 
 ## Board status
 
-All six designs are simulation-verified (`make sim-all` - see above). Real
-hardware bitstream builds hit a recurring Vivado licensing error
-(`ERROR: ... a valid license was not found`, the same node-locked-license
-issue noted in `CLAUDE.md`/`docs/build_system.md`) partway through this
-module and haven't all been confirmed on real hardware yet.
-
 | Board | Status |
 |---|---|
-| nexys4 | simulation-verified; hardware build pending (blocked by Vivado licensing) |
-| rfsoc4x2 | simulation-verified; hardware build not yet attempted |
-| blackboard | simulation-verified; hardware build not yet attempted |
+| nexys4 | ready - all six demos built |
+| rfsoc4x2 | ready - spot-checked with adder_top |
+| blackboard | ready - spot-checked with adder_top |

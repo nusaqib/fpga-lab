@@ -22,27 +22,35 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   Verilog; `assign` vs always-block combinational style; simulation basics
   (a testbench for the first time - `make sim`/`sim-all` now exist, xvlog/
   xelab/xsim, no project needed). Boards: all three, verified building.
-- [~] `02_arithmetic_circuits` - adders (ripple-carry, then a concrete
+- [x] `02_arithmetic_circuits` - adders (ripple-carry, then a concrete
   carry-lookahead adder cross-checked against it), comparators, ALU.
-  Introduces `generate`. All designs simulation-verified; hardware
-  bitstream builds still pending (blocked mid-session by a recurring Vivado
-  licensing error - see the module's own README "Board status").
+  Introduces `generate`. All sims pass; all six demos built on Nexys4,
+  spot-checked on RFSoC4x2 + BlackBoard.
 
 ## Tier 2 - Sequential logic & clocking
 
-- [ ] `03_flip_flops_and_registers` - D flip-flops, registers, why
-  non-blocking (`<=`) matters, metastability intro.
-- [ ] `04_clock_dividers_and_debouncing` - real oscillator-driven blinky on
-  Nexys4; button debounce as a small FSM; foreshadows the "no free clock"
-  problem on the Zynq boards.
-- [ ] `05_counters_and_shift_registers`
-- [ ] `06_finite_state_machines` - Moore vs Mealy, one-hot vs binary encoding,
-  a real project (e.g. a simple traffic-light or vending-machine controller).
+- [x] `03_flip_flops_and_registers` - D flip-flops (async/sync reset,
+  enable), registers, why non-blocking (`<=`) matters, metastability intro
+  (sync2 + ASYNC_REG). First clocked module; nexys4 + blackboard built,
+  rfsoc4x2 deferred to Tier 5 (no PL clock).
+- [x] `04_clock_dividers_and_debouncing` - tick_gen enable idiom (and the
+  derived-clock trap), counter-based debouncer, edge detect; classic 1Hz
+  blinky + press counter. The naive-vs-debounced bench counts 35 vs 5 for
+  5 bouncy presses. nexys4 + blackboard built.
+- [x] `05_counters_and_shift_registers` - up/down counter, SIPO shift
+  register, self-correcting ring counter, maximal-length LFSR (period-15
+  proof); power-up initializer idiom. Sims pass; hardware builds queued.
+- [x] `06_finite_state_machines` - Moore vs Mealy twin "1011" detectors
+  (one-cycle difference asserted in the bench), FSM style rules, and a
+  pedestrian-crossing traffic light with min-green + latched request.
+  Sims pass; hardware builds queued.
 
 ## Tier 3 - Memory & timing
 
-- [ ] `07_block_ram_and_fifos` - inferring BRAM, synchronous vs asynchronous
-  FIFOs, why they matter for clock domain crossing.
+- [~] `07_block_ram_and_fifos` - inferring BRAM (registered read,
+  collision semantics, ram_style), synchronous FIFO with the
+  extra-pointer-bit trick, verified against an SV queue model; async FIFO
+  deferred to 08 as the CDC capstone. Sims pass; hardware builds queued.
 - [ ] `08_clock_domain_crossing` - two-flop synchronizers, handshake CDC,
   Vivado CDC reports.
 - [ ] `09_timing_closure_basics` - reading a timing report, setup/hold,
