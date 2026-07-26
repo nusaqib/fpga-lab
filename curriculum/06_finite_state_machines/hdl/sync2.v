@@ -24,8 +24,8 @@ module sync2 (
     output     sync_out
 );
 
-    (* ASYNC_REG = "TRUE" *) reg meta;
-    (* ASYNC_REG = "TRUE" *) reg stable;
+    (* ASYNC_REG = "TRUE" *) reg meta   = 1'b0;
+    (* ASYNC_REG = "TRUE" *) reg stable = 1'b0;
 
     always @(posedge clk) begin
         meta   <= async_in;
