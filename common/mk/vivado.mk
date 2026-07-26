@@ -77,6 +77,17 @@ xsa: $(BIT)
 		-tclargs $(XPR) $(XSA_FILE)
 	@echo "XSA: $(XSA_FILE)"
 
+# Out-of-context synthesis of $(OOC_TOP) (defaults to $(TOP)): no pins, no
+# project - just "what does this block really synthesize to on this part".
+OOC_TOP ?= $(TOP)
+.PHONY: ooc
+ooc:
+	mkdir -p $(OUT_DIR)/ooc/$(BOARD)/$(OOC_TOP)
+	$(VIVADO) -mode batch -log $(OUT_DIR)/ooc/$(BOARD)/$(OOC_TOP)/vivado.log \
+		-journal $(OUT_DIR)/ooc/$(BOARD)/$(OOC_TOP)/vivado.jou \
+		-source $(COMMON_TCL_DIR)/synth_ooc.tcl \
+		-tclargs $(FPGA_PART) $(OOC_TOP) $(OUT_DIR)/ooc/$(BOARD)/$(OOC_TOP) $(SRC_V)
+
 clean:
 	rm -rf $(OUT_DIR)
 

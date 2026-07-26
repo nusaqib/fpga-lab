@@ -119,8 +119,13 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   generated Verilog. Honest comparison table vs the hand-written skid
   buffer. Toolchain: no vitis_hls binary in 2026.1 - common/mk/hls.mk
   wraps `v++ --mode hls` + `vitis-run` with a generated per-board config.
-- [ ] `20_dsp_fundamentals` - fixed-point arithmetic, DSP48 slices, a FIR
-  filter (HDL and HLS versions).
+- [x] `20_dsp_fundamentals` - Q1.15 end to end (growth, round-to-nearest,
+  saturation planted via coefficients summing to exactly 1.0), a 4-tap FIR
+  twice: hand transposed-form Verilog (4 DSP48s via `make ooc`, the new
+  out-of-context synth target) vs HLS (2 DSPs - it found the symmetric-FIR
+  pre-adder trick unasked). Bit-exact against one shared model; sims,
+  cosim, and OOC synth all green. Bonus lesson: 0.25 coefficients cost
+  zero multipliers (2^13 is a shift) - constant choice changes hardware.
 - [ ] `21_hls_streaming_and_dataflow` - `hls::stream`, dataflow pipelining,
   integrating an HLS IP into the Tier 4/5 AXI-Stream infrastructure.
 
