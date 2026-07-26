@@ -5,10 +5,18 @@
 #
 # Usage:
 #   vivado -mode batch -source build_project.tcl -tclargs \
-#       <proj_name> <part> <proj_dir> <src_files> <xdc_files> <top> [board_part] [synth_only]
+#       <proj_name> <part> <proj_dir> <src_files> <xdc_files> <top> \
+#       [board_part] [synth_only|""] [bd_tcl] [ip_tcl]
+#
+# bd_tcl: optional script that creates one or more block designs
+#   (create_bd_design ... save_bd_design). Sourced only when the project
+#   has no .bd yet; wrappers are generated automatically afterwards.
+# ip_tcl: optional script that creates standalone IP (create_ip ...).
+#   Sourced every run - the module's script must guard itself for
+#   idempotency (e.g. `if {[llength [get_ips foo]] == 0} { ... }`).
 
 if {$argc < 6} {
-    puts "ERROR: build_project.tcl <proj_name> <part> <proj_dir> <src_files> <xdc_files> <top> \[board_part\] \[synth_only\]"
+    puts "ERROR: build_project.tcl <proj_name> <part> <proj_dir> <src_files> <xdc_files> <top> \[board_part\] \[synth_only\] \[bd_tcl\] \[ip_tcl\]"
     exit 1
 }
 
@@ -20,6 +28,8 @@ set xdc_files  [lindex $argv 4]
 set top        [lindex $argv 5]
 set board_part [expr {$argc > 6 ? [lindex $argv 6] : ""}]
 set synth_only [expr {$argc > 7 && [lindex $argv 7] eq "synth_only"}]
+set bd_tcl     [expr {$argc > 8 ? [lindex $argv 8] : ""}]
+set ip_tcl     [expr {$argc > 9 ? [lindex $argv 9] : ""}]
 
 set proj_path [file join $proj_dir $proj_name]
 
@@ -36,9 +46,14 @@ set_property top $top [current_fileset]
 
 # Re-sync the source list every run so stale/removed files never linger in
 # the project (idempotent: safe to run repeatedly as HDL/constraints change).
-set existing_srcs [get_files -quiet -of_objects [get_filesets sources_1]]
-if {[llength $existing_srcs] > 0} {
-    remove_files -fileset sources_1 $existing_srcs
+# Files living under the project dir itself (generated BD wrappers, IP
+# output products) are left alone - only user files from the module tree
+# get refreshed.
+set proj_dir_norm [file normalize $proj_dir]
+foreach f [get_files -quiet -of_objects [get_filesets sources_1]] {
+    if {[string first $proj_dir_norm [file normalize $f]] != 0} {
+        remove_files -fileset sources_1 $f
+    }
 }
 set existing_constrs [get_files -quiet -of_objects [get_filesets constrs_1]]
 if {[llength $existing_constrs] > 0} {
@@ -47,6 +62,23 @@ if {[llength $existing_constrs] > 0} {
 
 add_files -norecurse -fileset sources_1 $src_files
 add_files -norecurse -fileset constrs_1 $xdc_files
+
+# Optional block design: source the creating script once (first build),
+# then generate output products + an HDL wrapper the top can instantiate.
+if {$bd_tcl ne "" && [llength [get_files -quiet *.bd]] == 0} {
+    source $bd_tcl
+    foreach bd [get_files -quiet *.bd] {
+        generate_target all $bd
+        set wrapper [make_wrapper -files $bd -top -force]
+        add_files -norecurse -fileset sources_1 $wrapper
+    }
+}
+
+# Optional standalone IP (script guards its own idempotency).
+if {$ip_tcl ne ""} {
+    source $ip_tcl
+}
+
 set_property top $top [current_fileset]
 update_compile_order -fileset sources_1
 

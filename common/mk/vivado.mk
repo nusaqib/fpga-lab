@@ -12,6 +12,12 @@ VIVADO := bash -c 'source $(VIVADO_SETTINGS) && exec vivado "$$@"' vivado
 TOP   ?= top
 SRC_V ?= $(wildcard hdl/*.v) $(wildcard hdl/*.sv) $(wildcard hdl/*.vhd)
 XDC   ?= $(wildcard constraints/$(BOARD)*.xdc)
+# Optional IP-integrator hooks (see docs/build_system.md and module 10):
+# BD_TCL - script creating block design(s); sourced on first build, wrapper
+#          auto-generated. IP_TCL - script creating standalone IP; sourced
+#          every build, must guard its own idempotency.
+BD_TCL ?=
+IP_TCL ?=
 
 VIVADO_PROJ_DIR := $(OUT_DIR)/$(BOARD)/vivado
 XPR             := $(VIVADO_PROJ_DIR)/$(PROJ_NAME).xpr
@@ -24,10 +30,14 @@ XELAB := bash -c 'source $(VIVADO_SETTINGS) && exec xelab "$$@"' xelab
 XSIM  := bash -c 'source $(VIVADO_SETTINGS) && exec xsim "$$@"' xsim
 
 SIM_V   ?= $(wildcard sim/*.v)
+# Only tb_*.v files are runnable testbench tops; other sim/*.v files (e.g.
+# behavioral stubs for generated IP, see module 10) are compiled alongside
+# but never elaborated as a top.
+SIM_TB  ?= $(wildcard sim/tb_*.v)
 # Default to the first testbench found so `make sim` works with zero extra
 # arguments in the common case of one testbench per module; override with
 # `make SIM_TOP=tb_other_thing sim` when there's more than one.
-SIM_TOP ?= $(basename $(notdir $(firstword $(SIM_V))))
+SIM_TOP ?= $(basename $(notdir $(firstword $(SIM_TB))))
 SIM_DIR := $(OUT_DIR)/sim
 SIM_SRC_ABS := $(abspath $(SRC_V))
 SIM_TB_ABS  := $(abspath $(SIM_V))
@@ -41,16 +51,16 @@ bitstream: $(BIT)
 # per-project, so they can't just live next to the .xpr on their own).
 VIVADO_LOG_ARGS = -log $(VIVADO_PROJ_DIR)/vivado.log -journal $(VIVADO_PROJ_DIR)/vivado.jou
 
-$(BIT) $(XPR) &: $(SRC_V) $(XDC)
+$(BIT) $(XPR) &: $(SRC_V) $(XDC) $(BD_TCL) $(IP_TCL)
 	@if [ -z "$(strip $(SRC_V))" ]; then echo "ERROR: SRC_V is empty - no HDL sources found"; exit 1; fi
 	@if [ -z "$(strip $(XDC))" ]; then echo "ERROR: XDC is empty - no constraints found for BOARD=$(BOARD)"; exit 1; fi
 	mkdir -p $(VIVADO_PROJ_DIR)
 	$(VIVADO) -mode batch $(VIVADO_LOG_ARGS) -source $(COMMON_TCL_DIR)/build_project.tcl \
-		-tclargs $(PROJ_NAME) $(FPGA_PART) $(VIVADO_PROJ_DIR) "$(SRC_V)" "$(XDC)" $(TOP) "$(BOARD_PART)"
+		-tclargs $(PROJ_NAME) $(FPGA_PART) $(VIVADO_PROJ_DIR) "$(SRC_V)" "$(XDC)" $(TOP) "$(BOARD_PART)" "" "$(BD_TCL)" "$(IP_TCL)"
 
 synth: $(XPR)
 	$(VIVADO) -mode batch $(VIVADO_LOG_ARGS) -source $(COMMON_TCL_DIR)/build_project.tcl \
-		-tclargs $(PROJ_NAME) $(FPGA_PART) $(VIVADO_PROJ_DIR) "$(SRC_V)" "$(XDC)" $(TOP) "$(BOARD_PART)" synth_only
+		-tclargs $(PROJ_NAME) $(FPGA_PART) $(VIVADO_PROJ_DIR) "$(SRC_V)" "$(XDC)" $(TOP) "$(BOARD_PART)" synth_only "$(BD_TCL)" "$(IP_TCL)"
 
 gui: $(XPR)
 	$(VIVADO) $(XPR) &
@@ -82,9 +92,9 @@ sim:
 		echo ">>> Simulation PASSED ($(SIM_TOP))"; \
 	fi
 
-# Run every testbench under sim/ one at a time, stopping at the first failure.
+# Run every tb_*.v under sim/ one at a time, stopping at the first failure.
 sim-all:
-	@for tb in $(basename $(notdir $(SIM_V))); do \
+	@for tb in $(basename $(notdir $(SIM_TB))); do \
 		echo "=== $$tb ==="; \
 		$(MAKE) SIM_TOP=$$tb sim || exit 1; \
 	done

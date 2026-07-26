@@ -61,9 +61,11 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
 
 ## Tier 4 - IP integrator, AXI, and going bigger
 
-- [ ] `10_ip_integrator_intro` - block design basics, Clocking Wizard, VIO/ILA
-  for on-chip debug (a genuinely useful skill introduced here and reused
-  everywhere after).
+- [~] `10_ip_integrator_intro` - block designs as code (BD_TCL/IP_TCL build
+  hooks; .bd is an artifact, the creating Tcl is the source), Clocking
+  Wizard/MMCM (module 04's promise kept), and an ILA on the live counter
+  with the trigger walkthrough. Sims pass (IP stubbed); hardware builds
+  queued.
 - [ ] `11_axi_and_custom_ip` - AXI4-Lite from scratch, packaging your own IP,
   wiring it into a block design.
 - [ ] `12_dma_and_streaming` - AXI-Stream, AXI DMA, moving real data between
