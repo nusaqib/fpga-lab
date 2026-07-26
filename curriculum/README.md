@@ -85,9 +85,12 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   via the new board.repoPaths hook; pl_clk0 finally alive - the RFSoC4x2's
   first clocked PL design built and verified, plus both boards' first
   `.xsa` exports (make xsa). Vitis "hello world" moves to module 14.
-- [ ] `14_bare_metal_gpio_and_interrupts` - PS-side GPIO, interrupts, timers
-  in Vitis, driving the same LEDs/buttons `00_first_bitstream` used, now from
-  software.
+- [x] `14_bare_metal_gpio_and_interrupts` - first software module: C on
+  the A9/A53 drives AXI GPIO over M_AXI_GP0, and a real fabric interrupt
+  (AXI GPIO -> IRQ_F2P/pl_ps_irq0 -> GIC -> ISR) replaces polling; main()
+  sleeps in wfi. Toolchain note: XSCT is disabled in Vitis 2026.1 - the
+  build system's software path (vitis.mk + common/tcl/build_app.py) uses
+  the Vitis Python interface. bitstream+xsa+elf build on both Zynq boards.
 - [ ] `15_custom_ip_from_ps` - PS talking to your own AXI IP from Tier 4.
 
 ## Tier 6 - Embedded Linux
