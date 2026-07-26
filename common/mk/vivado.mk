@@ -68,6 +68,15 @@ gui: $(XPR)
 program: $(BIT)
 	$(VIVADO) -mode batch $(VIVADO_LOG_ARGS) -source $(COMMON_TCL_DIR)/program.tcl -tclargs $(BIT)
 
+# Hardware platform export for Vitis (Tier 5+): builds the bitstream if
+# needed, then writes <module>_<board>.xsa next to the project.
+XSA_FILE := $(VIVADO_PROJ_DIR)/$(PROJ_NAME)_$(BOARD).xsa
+.PHONY: xsa
+xsa: $(BIT)
+	$(VIVADO) -mode batch $(VIVADO_LOG_ARGS) -source $(COMMON_TCL_DIR)/export_xsa.tcl \
+		-tclargs $(XPR) $(XSA_FILE)
+	@echo "XSA: $(XSA_FILE)"
+
 clean:
 	rm -rf $(OUT_DIR)
 

@@ -33,6 +33,13 @@ set ip_tcl     [expr {$argc > 9 ? [lindex $argv 9] : ""}]
 
 set proj_path [file join $proj_dir $proj_name]
 
+# Vendored board definitions (set by common/mk/common.mk) - lets
+# set_property board_part actually resolve, and block automation apply
+# real PS presets from boards/<board>/board_files.
+if {[info exists ::env(FPGA_LAB_BOARD_REPOS)] && $::env(FPGA_LAB_BOARD_REPOS) ne ""} {
+    set_param board.repoPaths [split $::env(FPGA_LAB_BOARD_REPOS)]
+}
+
 if {[file exists ${proj_path}.xpr]} {
     open_project ${proj_path}.xpr
 } else {

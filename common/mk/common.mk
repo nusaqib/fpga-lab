@@ -12,6 +12,12 @@ BOARD ?= nexys4
 BOARD_DIR := $(REPO_ROOT)/boards/$(BOARD)
 -include $(BOARD_DIR)/board.mk
 
+# Make every vendored board_files dir visible to Vivado (board.repoPaths,
+# consumed by common/tcl/build_project.tcl). This is what lets block
+# automation apply real PS presets (DDR timings, MIO) from the vendored
+# board definitions instead of hand-typing hundreds of PCW_*/PSU__* values.
+export FPGA_LAB_BOARD_REPOS := $(wildcard $(REPO_ROOT)/boards/*/board_files)
+
 OUT_DIR  ?= _out
 PROJ_NAME ?= $(notdir $(patsubst %/,%,$(CURDIR)))
 
