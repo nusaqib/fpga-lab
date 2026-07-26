@@ -15,6 +15,7 @@ VITISRUN  := bash -c 'source $(VITIS_SETTINGS) && exec vitis-run "$$@"' vitis-ru
 
 HLS_TOP    ?= top
 HLS_CLK_NS ?= 10
+HLS_PKG    ?= rtl
 HLS_SRC    ?= hls/$(HLS_TOP).cpp
 HLS_TB     ?= hls/tb_$(HLS_TOP).cpp
 
@@ -36,7 +37,7 @@ $(HLS_CFG): $(HLS_SRC) $(HLS_TB)
 	   echo "syn.top=$(HLS_TOP)"; \
 	   echo "tb.file=$(abspath $(HLS_TB))"; \
 	   echo "clock=$(HLS_CLK_NS)ns"; \
-	   echo "package.output.format=rtl"; } > $@
+	   echo "package.output.format=$(HLS_PKG)"; } > $@
 
 $(HLS_RTL): $(HLS_CFG)
 	$(VPP) -c --mode hls --config $(HLS_CFG) --work_dir $(HLS_DIR)
@@ -64,6 +65,16 @@ hls-cosim: $(HLS_RTL)
 
 hls-report: $(HLS_RTL)
 	@sed -n '1,60p' $(HLS_RPT)
+
+# Package the synthesized kernel as a Vivado IP (set HLS_PKG=ip_catalog in
+# the module Makefile) - the output dir becomes an ip_repo_paths entry for
+# BD scripts to instantiate from.
+HLS_IP_DIR := $(HLS_DIR)/hls/impl/ip
+.PHONY: hls-package
+hls-package: $(HLS_RTL)
+	$(VITISRUN) --mode hls --package --config $(HLS_CFG) --work_dir $(HLS_DIR)
+	@ls $(HLS_IP_DIR)/component.xml >/dev/null 2>&1 && echo "HLS IP: $(HLS_IP_DIR)" \
+		|| { echo "ERROR: packaged IP not found under $(HLS_IP_DIR)"; exit 1; }
 
 clean-hls:
 	rm -rf $(OUT_DIR)/hls

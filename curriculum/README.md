@@ -126,8 +126,12 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   pre-adder trick unasked). Bit-exact against one shared model; sims,
   cosim, and OOC synth all green. Bonus lesson: 0.25 coefficients cost
   zero multipliers (2^13 is a shift) - constant choice changes hardware.
-- [ ] `21_hls_streaming_and_dataflow` - `hls::stream`, dataflow pipelining,
-  integrating an HLS IP into the Tier 4/5 AXI-Stream infrastructure.
+- [x] `21_hls_streaming_and_dataflow` - FIR + decimate-by-2 as one
+  DATAFLOW kernel (task-level vs instruction-level parallelism, internal
+  hls::stream with a plain struct - ap_axiu is ports-only, HLS 214-208),
+  packaged as Vivado IP (`make hls-package`, new) and dropped into module
+  12's src->capture pipeline: bitstreams on nexys4 + blackboard, LEDs
+  jump by 8 per press (decimation visible), JTAG-readable capture.
 
 ## Tier 8 - RF data converters (RFSoC4x2)
 
