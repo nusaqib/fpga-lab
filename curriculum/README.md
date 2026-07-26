@@ -114,8 +114,11 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
 
 ## Tier 7 - High-level synthesis & DSP
 
-- [ ] `19_hls_intro` - Vitis HLS: C/C++ to RTL for a simple filter, comparing
-  hand-written HDL vs HLS output.
+- [x] `19_hls_intro` - module 12's stream scaler as ~15 lines of HLS C++:
+  csim -> csynth (II=1, ~74 LUT, est. 220MHz) -> cosim against the
+  generated Verilog. Honest comparison table vs the hand-written skid
+  buffer. Toolchain: no vitis_hls binary in 2026.1 - common/mk/hls.mk
+  wraps `v++ --mode hls` + `vitis-run` with a generated per-board config.
 - [ ] `20_dsp_fundamentals` - fixed-point arithmetic, DSP48 slices, a FIR
   filter (HDL and HLS versions).
 - [ ] `21_hls_streaming_and_dataflow` - `hls::stream`, dataflow pipelining,
