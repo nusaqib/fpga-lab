@@ -79,8 +79,15 @@ add_files -norecurse -fileset constrs_1 $xdc_files
 
 # Optional block design: source the creating script once (first build),
 # then generate output products + an HDL wrapper the top can instantiate.
-if {$bd_tcl ne "" && [llength [get_files -quiet *.bd]] == 0} {
-    source $bd_tcl
+# The wrapper step runs even when the .bd already exists: create_bd_design
+# writes the .bd to disk immediately, so a BD script that dies partway
+# leaves a wrapperless .bd behind - and the next invocation would
+# otherwise skip straight to a "wrapper not found" synthesis failure
+# instead of healing (learned from module 15's first build).
+if {$bd_tcl ne ""} {
+    if {[llength [get_files -quiet *.bd]] == 0} {
+        source $bd_tcl
+    }
     foreach bd [get_files -quiet *.bd] {
         generate_target all $bd
         set wrapper [make_wrapper -files $bd -top -force]

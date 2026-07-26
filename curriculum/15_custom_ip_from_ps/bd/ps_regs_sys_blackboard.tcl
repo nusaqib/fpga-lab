@@ -33,7 +33,15 @@ connect_bd_net [get_bd_ports btn] [get_bd_pins axil_regs_0/btn]
 
 assign_bd_address
 # Deterministic base address (matches the fallback in src/main.c should
-# the BSP not emit an XPAR macro for a module-reference block).
-set_property offset 0x43C00000 [get_bd_addr_segs -quiet -of_objects [get_bd_addr_spaces -quiet -filter {NAME =~ "*Data*" || NAME =~ "*HPM0*"}]]
+# the BSP not emit an XPAR macro for a module-reference block). Select the
+# segment by the slave's name and insist on exactly one match - a -quiet
+# getter feeding set_property an empty list kills the whole script.
+set seg [get_bd_addr_segs -filter {NAME =~ "*axil_regs*"}]
+if {[llength $seg] != 1} { error "expected exactly one axil_regs segment, got '$seg'" }
+# Range first: auto-assignment gives the segment the whole master aperture
+# (1G), and a 1G-range segment can only start at the aperture base - the
+# offset write fails with BD 41-70 until the range is shrunk.
+set_property range 64K $seg
+set_property offset 0x43C00000 $seg
 validate_bd_design
 save_bd_design

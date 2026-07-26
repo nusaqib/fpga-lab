@@ -27,7 +27,12 @@
 // guessing from names.
 module axil_regs (
     (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 aclk CLK",
-       X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF s_axil, ASSOCIATED_RESET aresetn, FREQ_HZ 100000000" *)
+       X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF s_axil, ASSOCIATED_RESET aresetn" *)
+    // ^ deliberately NO FREQ_HZ here, unlike module 11's original: the
+    // PSU's pl_clk0 is really 99999985 Hz (integer dividers from the PS
+    // reference, not an exact 100MHz), and a hardcoded FREQ_HZ fails BD
+    // validation with a frequency-mismatch error. Left unset, the BD
+    // propagates the true frequency into the interface.
     input             aclk,
     (* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 aresetn RST",
        X_INTERFACE_PARAMETER = "POLARITY ACTIVE_LOW" *)

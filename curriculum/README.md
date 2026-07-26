@@ -91,12 +91,22 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   sleeps in wfi. Toolchain note: XSCT is disabled in Vitis 2026.1 - the
   build system's software path (vitis.mk + common/tcl/build_app.py) uses
   the Vitis Python interface. bitstream+xsa+elf build on both Zynq boards.
-- [ ] `15_custom_ip_from_ps` - PS talking to your own AXI IP from Tier 4.
+- [x] `15_custom_ip_from_ps` - the processor drives OUR peripheral:
+  module 11's axil_regs behind M_AXI_GP0/HPM0_FPD, its "driver" two
+  one-line Xil_In32/Out32 wrappers, self-checking PASS/FAIL over UART.
+  Base address pinned deterministically (range-then-offset - a
+  full-aperture segment can't be moved). RFSoC lesson: pl_clk0 is really
+  99999985 Hz, so no hardcoded FREQ_HZ on module-reference interfaces;
+  PSU-side AXI wired by hand after automation dangled a clk_wiz. Full
+  flow (bitstream+xsa+elf) green on both Zynq boards.
 
 ## Tier 6 - Embedded Linux
 
 - [ ] `16_petalinux_bringup` - build a minimal Linux for Blackboard and
-  RFSoC4x2 with PetaLinux, boot over SD.
+  RFSoC4x2 with PetaLinux, boot over SD. **Blocked on tooling:** PetaLinux
+  is not installed on this machine (checked 2026-07-26; it's a separate
+  ~30GB AMD installer, not part of Vivado/Vitis). Install it, then this
+  tier unblocks.
 - [ ] `17_device_trees_and_drivers` - wiring a custom PL peripheral into the
   device tree; a minimal kernel module or UIO-based userspace driver.
 - [ ] `18_linux_userspace_apps` - talking to hardware from Python/C on Linux
