@@ -39,22 +39,25 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   5 bouncy presses. nexys4 + blackboard built.
 - [x] `05_counters_and_shift_registers` - up/down counter, SIPO shift
   register, self-correcting ring counter, maximal-length LFSR (period-15
-  proof); power-up initializer idiom. Sims pass; hardware builds queued.
+  proof); power-up initializer idiom. Built on nexys4 + blackboard.
 - [x] `06_finite_state_machines` - Moore vs Mealy twin "1011" detectors
   (one-cycle difference asserted in the bench), FSM style rules, and a
   pedestrian-crossing traffic light with min-green + latched request.
-  Sims pass; hardware builds queued.
+  Built on nexys4 + blackboard.
 
 ## Tier 3 - Memory & timing
 
-- [~] `07_block_ram_and_fifos` - inferring BRAM (registered read,
+- [x] `07_block_ram_and_fifos` - inferring BRAM (registered read,
   collision semantics, ram_style), synchronous FIFO with the
   extra-pointer-bit trick, verified against an SV queue model; async FIFO
-  deferred to 08 as the CDC capstone. Sims pass; hardware builds queued.
-- [ ] `08_clock_domain_crossing` - two-flop synchronizers, handshake CDC,
-  Vivado CDC reports.
-- [ ] `09_timing_closure_basics` - reading a timing report, setup/hold,
-  false paths, multicycle paths - using whatever module up to now is tightest.
+  deferred to 08 as the CDC capstone. Built on nexys4 + blackboard.
+- [~] `08_clock_domain_crossing` - pulse_sync (toggle method),
+  handshake_sync (4-phase), and the Gray-pointer async FIFO capstone, all
+  proven under unrelated sim clocks both directions; thumb-as-write-clock
+  hardware demo. Sims pass; hardware builds queued.
+- [~] `09_timing_closure_basics` - a deliberately-failing triple-multiply
+  (read the negative WNS), its pipelined fix, and an honest multicycle
+  path with the -hold N-1 companion. Sims pass; hardware builds queued.
 
 ## Tier 4 - IP integrator, AXI, and going bigger
 
