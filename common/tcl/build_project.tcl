@@ -31,6 +31,13 @@ set synth_only [expr {$argc > 7 && [lindex $argv 7] eq "synth_only"}]
 set bd_tcl     [expr {$argc > 8 ? [lindex $argv 8] : ""}]
 set ip_tcl     [expr {$argc > 9 ? [lindex $argv 9] : ""}]
 
+# Diagnostic breadcrumb: empty-string args have historically been fragile
+# through the vivado wrapper scripts - print what actually arrived.
+puts "build_project.tcl argc=$argc"
+for {set i 0} {$i < $argc} {incr i} {
+    puts "  argv\[$i\] = '[lindex $argv $i]'"
+}
+
 set proj_path [file join $proj_dir $proj_name]
 
 # Vendored board definitions (set by common/mk/common.mk) - lets

@@ -71,19 +71,20 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   channels, byte strobes, SLVERR), dropped into a BD as an RTL module
   reference behind a JTAG-to-AXI master - registers pokeable from the
   Vivado Tcl console with no CPU. Built on nexys4 + blackboard.
-- [~] `12_axi_stream` - AXI-Stream fundamentals: an honest AXIS master,
+- [x] `12_axi_stream` - AXI-Stream fundamentals: an honest AXIS master,
   the skid buffer (registered-ready with a one-beat catch register - THE
   stream structure), and an AXIS sink with a JTAG-readable AXI4-Lite
   window. Real AXI DMA deferred to Tier 5 where actual DDR exists (noted
   in the module README). Sims pass under hostile random backpressure;
-  hardware builds queued.
+  built on nexys4 + blackboard.
 
 ## Tier 5 - Zynq processing system bring-up
 
-- [ ] `13_zynq_ps_bringup` - first PS+PL block design; Blackboard (Zynq-7000,
-  `processing_system7`) and RFSoC4x2 (Zynq UltraScale+, `zynq_ultra_ps_e`)
-  side by side; this is where `pl_clk0` first becomes available on those two
-  boards. First `.xsa` export, first Vitis bare-metal "hello world".
+- [x] `13_zynq_ps_bringup` - PS+PL block designs for both Zynq boards
+  (PS7 + PSU side by side), presets applied from the vendored board files
+  via the new board.repoPaths hook; pl_clk0 finally alive - the RFSoC4x2's
+  first clocked PL design built and verified, plus both boards' first
+  `.xsa` exports (make xsa). Vitis "hello world" moves to module 14.
 - [ ] `14_bare_metal_gpio_and_interrupts` - PS-side GPIO, interrupts, timers
   in Vitis, driving the same LEDs/buttons `00_first_bitstream` used, now from
   software.
