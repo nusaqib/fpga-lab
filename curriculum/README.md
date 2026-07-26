@@ -62,15 +62,15 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
 
 ## Tier 4 - IP integrator, AXI, and going bigger
 
-- [~] `10_ip_integrator_intro` - block designs as code (BD_TCL/IP_TCL build
+- [x] `10_ip_integrator_intro` - block designs as code (BD_TCL/IP_TCL build
   hooks; .bd is an artifact, the creating Tcl is the source), Clocking
   Wizard/MMCM (module 04's promise kept), and an ILA on the live counter
   with the trigger walkthrough. Sims pass (IP stubbed); hardware builds
   queued.
-- [~] `11_axi_and_custom_ip` - a hand-written AXI4-Lite slave (all five
+- [x] `11_axi_and_custom_ip` - a hand-written AXI4-Lite slave (all five
   channels, byte strobes, SLVERR), dropped into a BD as an RTL module
   reference behind a JTAG-to-AXI master - registers pokeable from the
-  Vivado Tcl console with no CPU. Sims pass; hardware builds queued.
+  Vivado Tcl console with no CPU. Built on nexys4 + blackboard.
 - [ ] `12_dma_and_streaming` - AXI-Stream, AXI DMA, moving real data between
   PL and a memory-mapped source/sink.
 
