@@ -51,13 +51,14 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   collision semantics, ram_style), synchronous FIFO with the
   extra-pointer-bit trick, verified against an SV queue model; async FIFO
   deferred to 08 as the CDC capstone. Built on nexys4 + blackboard.
-- [~] `08_clock_domain_crossing` - pulse_sync (toggle method),
+- [x] `08_clock_domain_crossing` - pulse_sync (toggle method),
   handshake_sync (4-phase), and the Gray-pointer async FIFO capstone, all
   proven under unrelated sim clocks both directions; thumb-as-write-clock
-  hardware demo. Sims pass; hardware builds queued.
-- [~] `09_timing_closure_basics` - a deliberately-failing triple-multiply
-  (read the negative WNS), its pipelined fix, and an honest multicycle
-  path with the -hold N-1 companion. Sims pass; hardware builds queued.
+  hardware demo. Built on nexys4 + blackboard.
+- [x] `09_timing_closure_basics` - a deliberately-failing triple-multiply
+  (WNS -8.679ns, 80 failing endpoints, confirmed on a real build - go read
+  the report), its pipelined fix (passes), and an honest multicycle path
+  with the -hold N-1 companion. Built on nexys4 + blackboard.
 
 ## Tier 4 - IP integrator, AXI, and going bigger
 
@@ -66,8 +67,10 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   Wizard/MMCM (module 04's promise kept), and an ILA on the live counter
   with the trigger walkthrough. Sims pass (IP stubbed); hardware builds
   queued.
-- [ ] `11_axi_and_custom_ip` - AXI4-Lite from scratch, packaging your own IP,
-  wiring it into a block design.
+- [~] `11_axi_and_custom_ip` - a hand-written AXI4-Lite slave (all five
+  channels, byte strobes, SLVERR), dropped into a BD as an RTL module
+  reference behind a JTAG-to-AXI master - registers pokeable from the
+  Vivado Tcl console with no CPU. Sims pass; hardware builds queued.
 - [ ] `12_dma_and_streaming` - AXI-Stream, AXI DMA, moving real data between
   PL and a memory-mapped source/sink.
 
