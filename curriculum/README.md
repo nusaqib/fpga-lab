@@ -71,8 +71,12 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   channels, byte strobes, SLVERR), dropped into a BD as an RTL module
   reference behind a JTAG-to-AXI master - registers pokeable from the
   Vivado Tcl console with no CPU. Built on nexys4 + blackboard.
-- [ ] `12_dma_and_streaming` - AXI-Stream, AXI DMA, moving real data between
-  PL and a memory-mapped source/sink.
+- [~] `12_axi_stream` - AXI-Stream fundamentals: an honest AXIS master,
+  the skid buffer (registered-ready with a one-beat catch register - THE
+  stream structure), and an AXIS sink with a JTAG-readable AXI4-Lite
+  window. Real AXI DMA deferred to Tier 5 where actual DDR exists (noted
+  in the module README). Sims pass under hostile random backpressure;
+  hardware builds queued.
 
 ## Tier 5 - Zynq processing system bring-up
 
