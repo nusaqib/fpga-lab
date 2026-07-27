@@ -51,12 +51,13 @@ convention). This module's `_out/` holds only the XSA and the generated SDT.
 - [x] XSA -> SDT proven (`sdtgen`, rfsoc4x2).
 - [x] SDT -> MACHINE proven (`gen-machineconf`, `rfsoc4x2.conf` with
       cortexa53-fsbl + microblaze-pmu multiconfigs).
+- [x] Makefile wrapping of the whole chain (`common/mk/edf.mk`, new):
+      `make BOARD=<b> xsa sdt machine-conf image`.
 - [~] First `bitbake core-image-minimal xilinx-bootbin` for rfsoc4x2 in
       progress (first build compiles the cross-toolchain and kernel on two
       cores - hours; subsequent builds are incremental).
 - [ ] Same for blackboard (`zynq` family path).
 - [ ] SD card layout + boot on hardware, UART login.
-- [ ] Makefile wrapping of the sdtgen/gen-machineconf/bitbake steps.
 
 ## Board status
 
