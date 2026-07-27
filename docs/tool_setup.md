@@ -74,6 +74,16 @@ which turns a System Device Tree - produced from any of our XSAs by Vitis's
 `parse-xsa` mode is deprecated *and* depends on XSCT, so this repo only uses
 the `sdtgen` -> `parse-sdt` path.
 
+Two one-time customizations this repo makes to the workspace:
+
+- `bitbake-layers add-layer <repo>/linux/meta-fpgalab` - the repo's own
+  layer (module 17+): device-tree tweaks, app recipes, `fpgalab-image`.
+- in `build/conf/local.conf`: `IMAGE_FSTYPES:append = " wic"` and
+  `WKS_FILE = "edf-disk-single-rootfs.wks"` - EDF ships no flashable SD
+  image by default; this emits one in the official EDF layout (p1 vfat
+  boot, p2 storage, p3 ext4 root - the layout its `boot.scr` expects).
+  See `curriculum/16_edf_linux_bringup/README.md` for the boot flow.
+
 ## Making vendored board_files visible in the Vivado GUI (optional)
 
 The Makefile-driven flow in this repo never needs Vivado's board_part catalog

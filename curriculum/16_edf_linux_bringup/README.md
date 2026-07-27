@@ -44,25 +44,52 @@ The Yocto workspace is **shared and outside the repo** at `~/yocto/edf`
 boards and modules - the one deliberate exception to the per-module `_out/`
 convention). This module's `_out/` holds only the XSA and the generated SDT.
 
+## SD card & boot (what actually lands on the card)
+
+The first rfsoc4x2 build produced, in
+`~/yocto/edf/build/tmp/deploy/images/rfsoc4x2/`: `boot.bin` (FSBL + PMU
+firmware + ATF + u-boot + our PSU config, assembled by `xilinx-bootbin`),
+`boot.scr`, kernel `Image` (linux-xlnx 6.18), `system.dtb`, and the
+rootfs as `.tar.gz` / cpio variants.
+
+How boot actually flows (read from the shipped `boot.scr`, which comes
+from meta-amd-edf's `u-boot-edf-scr`): BootROM loads `BOOT.BIN` from the
+first FAT partition -> u-boot runs `boot.scr` -> kernel is ext4load'ed
+from **partition 3**, path `/boot/Image` (it lives inside the rootfs) ->
+the device tree is the one already inside BOOT.BIN (`fdtcontroladdr` -
+NOT loaded from disk) -> bootargs are read from that DT's `/chosen` (so
+module 17's dtsi tweaks propagate) plus `root=PARTUUID=<p3> ro rootwait`.
+
+The matching card layout is EDF's official wks
+(`edf-disk-single-rootfs.wks`): **p1** 1G vfat (BOOT.BIN, boot.scr,
+Image, dtb via IMAGE_BOOT_FILES), **p2** 2G vfat scratch storage, **p3**
+ext4 rootfs. EDF doesn't emit a flashable image by default (only a
+QEMU-shaped wic), so our shared `local.conf` appends
+`IMAGE_FSTYPES:append = " wic"` + `WKS_FILE = "edf-disk-single-rootfs.wks"`;
+then it's one `dd` of the `.wic` to the card.
+
 ## Status
 
 - [x] EDF 2026.1 workspace synced (`repo` manifest `rel-v2026.1`,
       `default-edf.xml`), bitbake environment sane.
-- [x] XSA -> SDT proven (`sdtgen`, rfsoc4x2).
+- [x] XSA -> SDT proven (`sdtgen`, both boards).
 - [x] SDT -> MACHINE proven (`gen-machineconf`, `rfsoc4x2.conf` with
       cortexa53-fsbl + microblaze-pmu multiconfigs).
 - [x] Makefile wrapping of the whole chain (`common/mk/edf.mk`, new):
       `make BOARD=<b> xsa sdt machine-conf image`.
-- [~] First `bitbake core-image-minimal xilinx-bootbin` for rfsoc4x2 in
-      progress (first build compiles the cross-toolchain and kernel on two
-      cores - hours; subsequent builds are incremental).
-- [ ] Same for blackboard (`zynq` family path).
-- [ ] SD card layout + boot on hardware, UART login.
+- [x] First `bitbake core-image-minimal xilinx-bootbin` for rfsoc4x2
+      **succeeded** (9975 tasks, 0 failures, ~1h45m - AMD's public
+      sstate mirror carried most of the cross-toolchain).
+- [x] Boot flow + SD layout traced from the real artifacts (above);
+      flashable wic enabled in local.conf.
+- [~] Same for blackboard (`zynq` family path) - XSA/SDT done, image
+      building.
+- [ ] Boot on hardware, UART login (bench).
 
 ## Board status
 
 | Board | Status |
 |---|---|
-| rfsoc4x2 | machine generated; first image building |
-| blackboard | pending (same flow, `--soc-family zynq`) |
+| rfsoc4x2 | image + BOOT.BIN built; awaiting SD + bench |
+| blackboard | XSA + SDT done; machine-conf + image in flight |
 | nexys4 | n/a - no hard PS; its Linux story would be a soft-CPU one (module 30's MicroBlaze-V could run Linux, but that's beyond this tier's scope) |

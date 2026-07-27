@@ -61,6 +61,11 @@ which userspace then `mmap`s. Two ways to point it at our node:
    (works when the driver is a module; check with
    `zcat /proc/config.gz | grep UIO_PDRV_GENIRQ`)
 2. **Baked into the boot** - kernel command line via `/chosen` bootargs.
+   One verified nuance (the 2026.1 linux-xlnx config builds
+   `CONFIG_UIO_PDRV_GENIRQ=m`): a cmdline `of_id=` configures the module
+   but doesn't LOAD it - pair the bootargs with a `modules-load.d` entry
+   or a manual modprobe. Only the `generic-uio` compatible hack gets
+   modalias-driven autoload, which is the one honest argument for it.
    `linux/meta-fpgalab/` (this repo's own Yocto layer, new in this module)
    carries a `device-tree.bbappend` that appends a dtsi through the
    recipe's official `EXTRA_DT_INCLUDE_FILES` hook. It's opt-in - set
