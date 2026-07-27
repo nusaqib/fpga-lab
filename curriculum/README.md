@@ -150,9 +150,15 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   1,-j,-1,j), runtime decimation 2x->4x showing "wrong math reads 200MHz,
   rate-aware math reads 100MHz again". bitstream+xsa+elf green; bench
   run pending SMA loopback.
-- [ ] `24_software_defined_radio_mini_project` - a small end-to-end SDR
-  exercise combining Tiers 7-8 (e.g. a tone generator + spectrum viewer, or a
-  simple AM/FM demod).
+- [x] `24_sdr_mini_project` - Tiers 7+8 combined into a working SDR:
+  HLS DDS transmitter (phase accumulator + ROMs, s_axilite phase_inc
+  register alongside ap_ctrl_none streaming), axis_combiner packs I+Q
+  into one 256-bit beat (simultaneous samples - two recorders could
+  never), 1024-pt libm-free FFT on the A53 (11 twiddle literals + the
+  rotation recurrence, host-verified), ASCII spectrum, and a tone sweep
+  whose verdict requires the peak on the correct SIDE of DC - the thing
+  module 23's single-component capture fundamentally couldn't see.
+  csim/cosim/sim + bitstream+xsa+elf green; bench run pending SMA.
 
 ## Tier 9 - High-speed I/O & networking
 
