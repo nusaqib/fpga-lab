@@ -82,14 +82,17 @@ then it's one `dd` of the `.wic` to the card.
       sstate mirror carried most of the cross-toolchain).
 - [x] Boot flow + SD layout traced from the real artifacts (above);
       flashable wic enabled in local.conf.
-- [~] Same for blackboard (`zynq` family path) - XSA/SDT done, image
-      building.
-- [ ] Boot on hardware, UART login (bench).
+- [x] Same for blackboard (`zynq` family path): machine conf generated
+      (cortexa9-fsbl multiconfig), image build succeeded (7727 tasks, 0
+      failures - sstate reuse made the second board far cheaper), uImage
+      + BOOT.BIN + flashable 3.2G `.wic` in the EDF layout.
+- [ ] Boot on hardware, UART login (bench: `dd` the `.wic`, console
+      115200 8N1 on the USB-UART).
 
 ## Board status
 
 | Board | Status |
 |---|---|
-| rfsoc4x2 | image + BOOT.BIN built; awaiting SD + bench |
-| blackboard | XSA + SDT done; machine-conf + image in flight |
+| rfsoc4x2 | image + BOOT.BIN + wic built; awaiting SD + bench |
+| blackboard | image + BOOT.BIN + wic built; awaiting SD + bench |
 | nexys4 | n/a - no hard PS; its Linux story would be a soft-CPU one (module 30's MicroBlaze-V could run Linux, but that's beyond this tier's scope) |

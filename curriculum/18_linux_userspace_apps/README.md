@@ -71,8 +71,9 @@ and spectrum machinery works regardless of mixer state.
 - [x] C app cross-compiles clean, both targets (aarch64 + armhf, static).
 - [x] Python byte-compiles; FFT/peak and dt_find host-verified.
 - [x] meta-fpgalab: uio-regs, fpgalab-py, fpgalab-image recipes written.
-- [ ] Recipes bitbake-verified (queued behind module 16's first image
-      build - the shared workspace's bitbake lock is single-occupancy).
+- [x] Recipes bitbake-verified: `uio-regs` compiles + packages with the
+      image's own toolchain, `fpgalab-py` packages (rfsoc4x2/aarch64;
+      recipes are arch-generic so blackboard follows with its image).
 - [ ] On-target run (bench session: module 16 image + module 17/24
       bitstreams).
 

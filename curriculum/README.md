@@ -109,12 +109,15 @@ EOL-bound. Tier 6 uses EDF: it's what the industry migrates to, it teaches
 real Yocto instead of a retiring wrapper, and it needs no installer,
 license, or AMD account - see `docs/tool_setup.md`.)*
 
-- [~] `16_edf_linux_bringup` - a minimal Linux for BlackBoard and RFSoC4x2
-  with EDF/Yocto, boot over SD. The custom-hardware chain, all from tools
-  we already have: `make xsa` -> `sdtgen` (XSA -> System Device Tree) ->
+- [x] `16_edf_linux_bringup` - a minimal Linux for BlackBoard and RFSoC4x2
+  with EDF/Yocto. The custom-hardware chain, all from tools we already
+  have: `make xsa` -> `sdtgen` (XSA -> System Device Tree) ->
   `gen-machineconf parse-sdt` (SDT -> Yocto MACHINE, including FSBL/PMU
-  multiconfigs) -> `bitbake`. Chain proven end to end for rfsoc4x2; first
-  image build in progress.
+  multiconfigs) -> `bitbake core-image-minimal xilinx-bootbin`. Both
+  boards built clean (9975 + 7727 tasks, 0 failures); boot flow traced
+  from the real artifacts (BOOT.BIN, boot.scr's partition-3 kernel load,
+  DT-borne bootargs) and flashable `.wic` images emitted in the official
+  EDF SD layout. (SD-card boot + UART login = bench.)
 - [x] `17_device_trees_and_drivers` - module 15's `axil_regs`, unchanged,
   meets the kernel: sdtgen turns the BD address map into a `pl.dtsi` node
   (`compatible = "xlnx,axil-regs-1.0"`, verified on both boards), and
@@ -132,8 +135,9 @@ license, or AMD account - see `docs/tool_setup.md`.)*
   module 24's SDR from a shell prompt (`sdr_capture.py 240 -240 480`) -
   DDS tone, snap capture, pure-Python FFT host-verified on module 24's
   exact tone set. `meta-fpgalab` grows app recipes + `fpgalab-image`
-  (minimal + python3 + our tools). (Recipes' first bitbake queued behind
-  module 16's build; on-target runs are bench items.)
+  (minimal + python3 + our tools). (Recipes bitbake-verified - uio-regs
+  compiles and packages with the image's own toolchain; on-target runs
+  are bench items.)
 
 ## Tier 7 - High-level synthesis & DSP
 
