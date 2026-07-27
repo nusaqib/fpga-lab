@@ -46,6 +46,10 @@ module tb_fifo_random;
 
     // ---------------- functional coverage, demystified ----------------
     integer cov_level[0:8];          // occupancy histogram
+    initial for (int k = 0; k <= 8; k++) cov_level[k] = 0;
+    // ^ uninitialized integers are X, and X+1 is X: the histogram would
+    //   print x forever AND the ==0 hole check would never fire (x != 0).
+    //   A coverage bug hiding a coverage hole - very on-theme.
     integer cov_push_pop  = 0;       // simultaneous push+pop
     integer cov_push_full = 0;       // push attempted while full
     integer cov_pop_empty = 0;       // pop attempted while empty

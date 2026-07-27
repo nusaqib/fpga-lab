@@ -177,14 +177,26 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   PMA loopback (no QSFP module needed), silicon-measured eye scans.
   README carries the concepts: CDR, why encoding exists, quads/QPLLs,
   refclk purity. Bitstream builds; bench run = Hardware Manager session.
-- [ ] `27_pmod_and_syzygy_peripherals` - a real off-board peripheral over
-  Pmod/SYZYGY, full stack from constraints to driver.
+- [x] `27_pmod_and_onboard_peripherals` - a real external peripheral,
+  full stack from constraints to driver, no CPU: the Nexys4's ADT7420
+  over I2C (same electrical/protocol reality as any Pmod). Hand-written
+  byte-level I2C master, datasheet transactions as an FSM (ID check +
+  temperature, the load-bearing repeated START), from-scratch UART TX,
+  "T=+025.5C" lines at 115200. The bench contains a behavioral ADT7420
+  slave - being both ends of the protocol is half the module. Caught
+  before hardware: inverted read-ACK, x-prop from missing initializers,
+  and a from-memory pinout that was the Nexys4-DDR's (vendored XDC won).
 
 ## Tier 10 - Mastery / capstone
 
-- [ ] `28_verification_basics` - a step up from ad hoc testbenches:
-  self-checking testbenches, functional coverage concepts, maybe a first
-  look at cocotb.
+- [x] `28_verification_basics` - directed vs constrained-random, proven
+  on a planted bug (registered full flag, one cycle late): the careful
+  directed bench passes on the BROKEN FIFO (its pass criterion encodes
+  that), bursty random + SV-queue scoreboard catches the corruption at
+  cycle 43. SVA invariants + functional coverage as hand-rolled counters
+  (with its own meta-lesson: an uninitialized histogram counts x+1=x and
+  defeats the hole check). Simulation-only by design. cocotb: blocked on
+  tooling (no pip/sudo); concepts transfer verbatim when installed.
 - [ ] `29_multiboard_project` - a project spanning two boards talking to each
   other (e.g. UART/Ethernet link between Nexys4 and RFSoC4x2).
 - [ ] `30_capstone` - open-ended, defined once we get here based on what's
