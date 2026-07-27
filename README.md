@@ -1,8 +1,9 @@
 # fpga-lab
 
 A from-scratch FPGA/SoC/RFSoC learning journey, driven module by module from
-basic digital logic through Zynq PS bring-up, embedded Linux, HLS/DSP, and
-RF data converters - targeting three real boards:
+basic digital logic through Zynq PS bring-up, HLS/DSP, RF data converters,
+gigabit serial, a fabric RISC-V SoC, and embedded Linux - targeting three
+real boards:
 
 - **Digilent Nexys4** (Artix-7, `xc7a100tcsg324-1`) - pure-fabric logic, no PS.
 - **RealDigital BlackBoard** (Zynq-7000, `xc7z007sclg400-1`) - smallest Zynq
@@ -10,9 +11,9 @@ RF data converters - targeting three real boards:
 - **RealDigital RFSoC4x2** (Zynq UltraScale+ RFSoC, `xczu48dr-ffvg1517-2-e`) -
   RF data converters, high-speed I/O, the deep end.
 
-See **`curriculum/README.md`** for the full syllabus (30 modules, Tier 0
-through Tier 10) and **`docs/build_system.md`** for how the scripted
-Make/Tcl build flow works.
+See **`curriculum/README.md`** for the full syllabus (31 modules, Tier 0
+through Tier 10, checkboxes = current progress) and
+**`docs/build_system.md`** for how the scripted Make/Tcl build flow works.
 
 ## Quickstart
 
@@ -28,6 +29,13 @@ make gui                             # open the generated .xpr in Vivado
 Every build's artifacts (Vivado project, runs, reports, bitstream) land in a
 gitignored `_out/<board>/` next to the module's sources - open the `.xpr`
 whenever you want to poke around in the GUI, and `make clean` to wipe it.
+
+Later-tier modules add more targets on the same pattern: `make sim` /
+`make sim-all` (self-checking testbenches), `make xsa` (hardware export
+for software flows), `make elf` (bare-metal C via the Vitis Python
+interface), `make ooc` (out-of-context synthesis with a resource
+one-liner), `make hls-csim|hls-synth|hls-cosim|hls-package` (HLS), and -
+for Tier 6 - the AMD EDF/Yocto Linux flow (see `docs/tool_setup.md`).
 
 ## Repo layout
 

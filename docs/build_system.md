@@ -30,9 +30,14 @@ and longer the very first time a given part's device libraries get cached.
   <module_name>.runs/synth_1/...          <- synthesis logs/reports
   <module_name>.runs/impl_1/...
                 ..../<top>.bit             <- the bitstream
-  <module_name>.runs/impl_1/vivado.log    <- this run's Vivado log/journal
-  <module_name>.runs/impl_1/vivado.jou
+  vivado.log                              <- this INVOCATION's log/journal
+  vivado.jou
 ```
+
+Note `vivado.log` is per-*invocation*, not per-project: any `make` target
+that runs Vivado again (e.g. `make xsa` after `make bitstream`) overwrites
+it. When diagnosing a failure, read the log **before** re-running anything -
+this has cost real debugging time twice.
 
 Other targets, run from inside the same module directory:
 
@@ -47,6 +52,19 @@ Other targets, run from inside the same module directory:
 | `make sim` | runs the module's default testbench (`sim/tb_*.v`) via `xvlog`/`xelab`/`xsim` - no board, no project |
 | `make SIM_TOP=tb_other sim` | runs a specific testbench when a module has more than one |
 | `make sim-all` | runs every testbench in `sim/`, stopping at the first failure |
+| `make BOARD=<b> xsa` | exports the hardware platform (`.xsa`) for software flows (Tier 5+) |
+| `make BOARD=<b> elf` | builds the bare-metal C app against the XSA via the Vitis Python interface (Tier 5+; set `CPU`, optional `BSP_LIBS`) |
+| `make BOARD=<b> ooc` | out-of-context synthesis of `OOC_TOP` (defaults to `TOP`): prints one `OOC RESULT: LUT/FF/DSP/BRAM` line, no pins needed (module 20+) |
+| `make hls-csim` / `hls-synth` / `hls-cosim` / `hls-package` | the HLS unified flow for modules with an `hls/` dir (`HLS_TOP`; `HLS_PKG=ip_catalog` for BD-consumable IP) (Tier 7+) |
+
+Two optional hooks a module Makefile can set (see modules 10/26 and every
+BD-based module since 13): `BD_TCL` - a script creating block design(s),
+sourced on first build with the wrapper auto-generated (the BD wrapper can
+BE the top: `TOP := <bd>_wrapper`); `IP_TCL` - a script creating standalone
+IP, sourced every build, must guard its own idempotency. Hand-written RTL
+placed in a BD as a *module reference* needs the `X_INTERFACE_INFO`
+attribute idiom - `curriculum/15_custom_ip_from_ps/hdl/axil_regs.v` is the
+annotated reference (including the deliberately-absent `FREQ_HZ`).
 
 Simulation output lands in `_out/sim/` (board-independent - there's no
 `BOARD=` for `sim`, since a behavioral testbench doesn't need a part/board at
@@ -107,17 +125,46 @@ recreating it from scratch, so incremental builds stay fast.
 
 ## Layout of a software (Vitis) module
 
-Introduced starting at `curriculum/07_zynq_ps_bringup`, once a hardware
-module has produced an exported `.xsa`:
+Introduced at `curriculum/13_zynq_ps_bringup` (XSA export) and
+`curriculum/14_bare_metal_gpio_and_interrupts` (first ELF); the module is
+still ONE directory - hardware and software sides share it:
 
 ```
 some_zynq_module/
-  hw/                  # the HDL module producing the .xsa (or a symlink/copy)
-  src/                 # C/C++ application sources
-  Makefile             # includes common/mk/{common,vitis}.mk
+  bd/                  # block-design Tcl (the PS + peripherals)
+  hdl/                 # any fabric RTL (module references, tops)
+  constraints/         # per-board XDC
+  src/                 # C application sources (copied into the Vitis app)
+  Makefile             # includes common/mk/{common,vivado,vitis}.mk and
+                       # sets CPU (ps7_cortexa9_0 / psu_cortexa53_0 /
+                       # microblaze_riscv_0), optionally BSP_LIBS (lwip220)
   _out/
-    <board>/vitis_ws/...
+    <board>/vivado/...              # .xpr, bitstream, <module>_<board>.xsa
+    <board>/vitis_ws/...            # platform + app, ELF under .../build/
 ```
+
+`make xsa` exports the platform; `make elf` regenerates the whole Vitis
+workspace from it every time (the BSP is a build artifact, never edited).
+XSCT is disabled in 2026.1 - `common/tcl/build_app.py` drives the Vitis
+Python interface instead; see `docs/tool_setup.md`.
+
+## Embedded Linux (EDF/Yocto) modules - Tier 6
+
+The Linux flow chains three tools, all wrapped by the module Makefile
+(introduced at `curriculum/16_edf_linux_bringup`):
+
+```
+make xsa                      # same hardware export as any Tier-5 module
+sdtgen                        # XSA -> System Device Tree (Vitis ships it)
+gen-machineconf parse-sdt     # SDT -> Yocto MACHINE definition
+bitbake <image>               # Yocto builds boot firmware + disk image
+```
+
+The Yocto workspace is SHARED and lives outside the repo at `~/yocto/edf`
+(50+ GB build trees don't fit the per-module `_out/` convention; downloads
+and sstate-cache are reused across boards and modules). Setup and rationale:
+`docs/tool_setup.md`. PetaLinux is deliberately not used - it is EOL-bound,
+superseded by EDF.
 
 ## Adding a new board
 

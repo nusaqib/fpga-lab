@@ -102,11 +102,19 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
 
 ## Tier 6 - Embedded Linux
 
-- [ ] `16_petalinux_bringup` - build a minimal Linux for Blackboard and
-  RFSoC4x2 with PetaLinux, boot over SD. **Blocked on tooling:** PetaLinux
-  is not installed on this machine (checked 2026-07-26; it's a separate
-  ~30GB AMD installer, not part of Vivado/Vitis). Install it, then this
-  tier unblocks.
+*(Toolchain note: this tier was originally scoped for PetaLinux, which AMD
+has since superseded with the Embedded Development Framework - EDF, plain
+upstream Yocto + AMD layers, first shipped with 2025.1; PetaLinux is
+EOL-bound. Tier 6 uses EDF: it's what the industry migrates to, it teaches
+real Yocto instead of a retiring wrapper, and it needs no installer,
+license, or AMD account - see `docs/tool_setup.md`.)*
+
+- [~] `16_edf_linux_bringup` - a minimal Linux for BlackBoard and RFSoC4x2
+  with EDF/Yocto, boot over SD. The custom-hardware chain, all from tools
+  we already have: `make xsa` -> `sdtgen` (XSA -> System Device Tree) ->
+  `gen-machineconf parse-sdt` (SDT -> Yocto MACHINE, including FSBL/PMU
+  multiconfigs) -> `bitbake`. Chain proven end to end for rfsoc4x2; first
+  image build in progress.
 - [ ] `17_device_trees_and_drivers` - wiring a custom PL peripheral into the
   device tree; a minimal kernel module or UIO-based userspace driver.
 - [ ] `18_linux_userspace_apps` - talking to hardware from Python/C on Linux

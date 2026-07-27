@@ -9,7 +9,7 @@ here*, not what the project is.
 A long-running, module-by-module FPGA/SoC/RFSoC learning journey across
 three real boards (Nexys4, RealDigital BlackBoard Rev. D, RFSoC4x2). There is
 no deadline and no fixed scope beyond "don't leave any concept behind" - see
-`curriculum/README.md` for the full 30-module syllabus and current progress.
+`curriculum/README.md` for the full syllabus and current progress.
 Treat this as an ongoing collaboration, not a one-shot task: expect to be
 invoked repeatedly over weeks/months to build the next module, and pick up
 from wherever `curriculum/README.md`'s checkboxes leave off.
@@ -19,6 +19,20 @@ from wherever `curriculum/README.md`'s checkboxes leave off.
 Vivado/Vitis 2026.1 live at `/opt/tools/2026.1`. `source env.sh` sets up
 interactive use; the Makefiles source `settings64.sh` themselves per
 invocation, so `make` alone never needs it. See `docs/tool_setup.md`.
+
+**2026.1 facts that invalidate older muscle memory:** XSCT is disabled
+(software builds go through the Vitis Python interface -
+`common/tcl/build_app.py`, `make elf`) and there is no `vitis_hls` binary
+(HLS is `v++ --mode hls` + `vitis-run` - `common/mk/hls.mk`, `make hls-*`).
+`sdtgen` and `xsdb` still exist and are used.
+
+**Embedded Linux is EDF (Yocto), not PetaLinux.** PetaLinux is EOL-bound and
+was never installed here; Tier 6 uses the AMD Embedded Development
+Framework - a plain Yocto workspace at `~/yocto/edf` (outside the repo: 50+
+GB build trees, shared across boards/modules), all from public GitHub, no
+license or installer. Flow: `make xsa` -> `sdtgen` -> `gen-machineconf
+parse-sdt` -> `bitbake`. Never use gen-machine-conf's `parse-xsa` (deprecated
+AND needs the disabled XSCT). Setup details in `docs/tool_setup.md`.
 
 ## Build system - read `docs/build_system.md` before touching Makefiles
 
@@ -58,6 +72,14 @@ unverified/TODO rather than filling in a plausible-looking number - a wrong
 pin constraint is a much more expensive mistake to chase down than an honest
 gap. When adding a new board, follow `docs/build_system.md`'s "Adding a new
 board" section.
+
+This rule has caught real errors ("Nexys4" LED/switch pins recalled from
+memory turned out to be the Nexys4-DDR's - module 27), and it extends
+beyond pins: register values for board chips are vendored from official
+repos (`boards/rfsoc4x2/rfclk/`), and **voltages count too** - module 29
+ships no RFSoC4x2 variant because the Pmod+ signal-level question
+(LVCMOS18 bank vs 3.3V connector Vdd, manual silent on shifting) is
+unresolved; don't wire it to a 3.3V board until a schematic answers.
 
 ## Curriculum conventions
 

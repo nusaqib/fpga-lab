@@ -21,6 +21,29 @@
 - `board_files/rfsoc4x2/1.0/` - the official Vivado board_files (`board.xml`,
   `part0_pins.xml`, `preset.xml`) from the same repo, enabling Zynq PS preset
   auto-configuration in IP integrator later.
+- `rfclk/` - the RF clock chips' (LMK04828 + 2x LMX2594) TICS register
+  dumps, vendored verbatim from the official Xilinx/RFSoC-PYNQ repo - the
+  exact values the PYNQ image programs at boot, used by
+  `curriculum/22_rf_dc_intro`'s bare-metal clock bring-up. See
+  `rfclk/UPSTREAM-README.md` for the SPI topology and per-chip protocol.
+
+## Pins verified beyond the XDCs (from the reference manual, Appendix A)
+
+- QSFP28: **GTY quad 128**, refclk `GTY_128_REF_CLK_QSFP` on **AA33/AA34**
+  at 156.25 MHz (independently confirmed by Vivado's MGTREFCLK0_128 pin
+  mapping) - used by `curriculum/26_high_speed_serial_intro`.
+- RF tile mapping (via the PYNQ base overlay): DAC_A = DAC tile 230 blk 0
+  (`vout20`), ADC_A = ADC tile 226 (`vin2_23`) - the tile-2 pair used by
+  Tier 8.
+
+## Pmod+ voltage - UNVERIFIED, treat as a hazard
+
+The Pmod+ signals sit on an **LVCMOS18** FPGA bank (per the vendored
+`4x2_PMOD.xdc`) while the connector's Vdd pins are **3.3V** (per the
+reference manual), and the manual does not state whether the signal pins
+are level-shifted. Until the schematic answers, do NOT wire this Pmod to a
+3.3V board's Pmod (this is why `curriculum/29_multiboard_project` has no
+RFSoC4x2 variant).
 
 ## Clocking gotcha for early (PL-only) modules
 
@@ -32,9 +55,12 @@ with no PS block design. RF sample clocks depend on the LMK04828/LMX2594
 synth chips being programmed over SPI, which is even further out.
 
 **Implication for the curriculum:** modules before Zynq PS bring-up
-(`curriculum/07_zynq_ps_bringup`) that target this board use a debounced
+(`curriculum/13_zynq_ps_bringup`) that target this board use a debounced
 pushbutton edge as their "clock" (a T flip-flop toggled by `PB_0`, etc.)
 instead of a free-running oscillator. See `curriculum/00_first_bitstream/`.
+From module 13 on, `pl_clk0` from the configured PS is the fabric clock;
+the RF sample clocks additionally need the LMK/LMX chain programmed over
+PS SPI0 (see `rfclk/` above and module 22).
 
 ## Refreshing vendored files
 
