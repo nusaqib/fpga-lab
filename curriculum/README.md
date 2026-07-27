@@ -170,8 +170,13 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   BSP_LIBS knob in vitis.mk/build_app.py (domain.set_lib). Static
   192.168.1.10, ping + nc port 7. bitstream+xsa+elf green; bench run
   pending an Ethernet cable.
-- [ ] `26_high_speed_serial_intro` - GTY transceivers on RFSoC4x2 conceptually
-  (QSFP28), what a serial link bring-up actually involves.
+- [x] `26_high_speed_serial_intro` - the GTY quad behind the QSFP28
+  cage (quad 128, refclk AA33/AA34 @ 156.25MHz - RealDigital reference
+  manual Appendix A, cross-checked against Vivado's MGTREFCLK0_128 pin
+  mapping) running IBERT at 10.3125 Gb/s: PRBS patterns, BER, internal
+  PMA loopback (no QSFP module needed), silicon-measured eye scans.
+  README carries the concepts: CDR, why encoding exists, quads/QPLLs,
+  refclk purity. Bitstream builds; bench run = Hardware Manager session.
 - [ ] `27_pmod_and_syzygy_peripherals` - a real off-board peripheral over
   Pmod/SYZYGY, full stack from constraints to driver.
 
