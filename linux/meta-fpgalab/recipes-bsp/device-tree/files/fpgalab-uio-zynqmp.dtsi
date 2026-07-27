@@ -1,0 +1,13 @@
+/* Kernel command line with uio_pdrv_genirq bound to our peripheral's
+ * REAL compatible string (from the sdtgen-generated pl.dtsi) - the
+ * hardware description itself stays truthful, we just tell the generic
+ * UIO driver which compatible to claim.
+ *
+ * A dts string property can't be appended to, only replaced, so this
+ * restates the bootargs sdtgen generates for ZynqMP and adds of_id=.
+ */
+/ {
+	chosen {
+		bootargs = "earlycon console=ttyPS0,115200 clk_ignore_unused init_fatal_sh=1 uio_pdrv_genirq.of_id=xlnx,axil-regs-1.0";
+	};
+};

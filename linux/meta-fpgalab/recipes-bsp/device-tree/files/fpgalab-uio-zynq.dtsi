@@ -1,0 +1,9 @@
+/* Zynq-7000 twin of fpgalab-uio-zynqmp.dtsi. sdtgen generates no
+ * bootargs for zynq (only stdout-path), so nothing is being replaced
+ * here - we add a console and the uio_pdrv_genirq binding.
+ */
+/ {
+	chosen {
+		bootargs = "console=ttyPS0,115200 uio_pdrv_genirq.of_id=xlnx,axil-regs-1.0";
+	};
+};
