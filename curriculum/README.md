@@ -197,8 +197,16 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   (with its own meta-lesson: an uninitialized histogram counts x+1=x and
   defeats the hole check). Simulation-only by design. cocotb: blocked on
   tooling (no pip/sudo); concepts transfer verbatim when installed.
-- [ ] `29_multiboard_project` - a project spanning two boards talking to each
-  other (e.g. UART/Ethernet link between Nexys4 and RFSoC4x2).
+- [x] `29_multiboard_project` - Nexys4 and BlackBoard talking over a
+  crossed Pmod cable: identical link_node RTL both ends (ID parameter +
+  pins differ), 4-byte checksummed heartbeat at 115200, each board's
+  LEDs showing the OTHER board's counter, link_up from a 3-beat timeout
+  (cut the cable -> drops; replug -> self-heals, no stored state). New
+  uart_rx with mid-bit sampling - the bench runs both nodes at 100.00
+  vs 100.30 MHz on purpose, plus corruption/cut/heal phases. RFSoC4x2
+  deliberately omitted: Pmod signal voltage unverified (LVCMOS18 bank,
+  3.3V connector Vdd, manual silent on shifting) - volts obey the same
+  truthfulness rule as pins. Sims green; both bitstreams build.
 - [ ] `30_capstone` - open-ended, defined once we get here based on what's
   most interesting by then (candidates: a PYNQ-style overlay workflow on
   RFSoC4x2, a soft-core RISC-V on Nexys4, a real SDR application).
