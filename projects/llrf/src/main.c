@@ -223,10 +223,10 @@ int main(void)
 
     /* capture starts at the pulse trigger; the first DELAY beats are
      * pre-pulse (must read 0 on the dac buffer), then the gate opens.
-     * (adc beats are 32 bytes, dac beats 16.) */
+     * (both captures: 32-byte beats; dac lane 0 = {Q,I}.) */
     xil_printf("dac drive around the gate edge (beat: I,Q):\r\n");
     for (int b = 254; b < 260; b++) {
-        uint32_t w0 = Xil_In32(SNAP_DAC_BASE + SNAP_BUF + b * 16);
+        uint32_t w0 = Xil_In32(SNAP_DAC_BASE + SNAP_BUF + b * 32);
         xil_printf("  %d: %d, %d\r\n", b, (int16_t)(w0 & 0xFFFF),
                    (int16_t)(w0 >> 16));
     }

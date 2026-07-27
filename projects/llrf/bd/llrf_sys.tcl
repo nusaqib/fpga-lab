@@ -67,14 +67,14 @@ set_property -dict [list CONFIG.NUM_MI {2} \
 ] $bc_adc
 set bc_dac [create_bd_cell -type ip -vlnv xilinx.com:ip:axis_broadcaster bc_dac]
 set_property -dict [list CONFIG.NUM_MI {2} \
-    CONFIG.M_TDATA_NUM_BYTES {16} CONFIG.S_TDATA_NUM_BYTES {16} \
-    CONFIG.M00_TDATA_REMAP {tdata[127:0]} CONFIG.M01_TDATA_REMAP {tdata[127:0]} \
+    CONFIG.M_TDATA_NUM_BYTES {32} CONFIG.S_TDATA_NUM_BYTES {32} \
+    CONFIG.M00_TDATA_REMAP {tdata[255:0]} CONFIG.M01_TDATA_REMAP {tdata[255:0]} \
 ] $bc_dac
 
 set snap_adc [create_bd_cell -type module -reference wave_snap snap_adc]
 set_property -dict [list CONFIG.DATA_W {256} CONFIG.ID_VALUE {0xACE011F1}] $snap_adc
 set snap_dac [create_bd_cell -type module -reference wave_snap snap_dac]
-set_property -dict [list CONFIG.DATA_W {128} CONFIG.ID_VALUE {0xACE011F2}] $snap_dac
+set_property -dict [list CONFIG.DATA_W {256} CONFIG.ID_VALUE {0xACE011F2}] $snap_dac
 
 set sc [create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect sc_0]
 set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {4} CONFIG.NUM_CLKS {2}] $sc

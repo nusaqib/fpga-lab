@@ -65,7 +65,7 @@ Everything below the LLRF logic is already proven in this repo:
 | After beat mean | 307.2 Mcplx/s | one Q1.15 IQ pair per cycle |
 | After 2^N decimator | 307.2/2^N Mcplx/s | N = 0..12; N=8 -> 1.2 MHz loop rate |
 | PI controller | strobe at decimated rate | Q1.15 in/out, 34-bit integrator |
-| DAC drive | held between strobes | 4 {Q,I} pairs per 128-bit beat, 1228.8 Mcplx/s |
+| DAC drive | held between strobes | 8 {Q,I} pairs per 256-bit beat, 2457.6 Mcplx/s |
 
 Q1.15 everywhere at module boundaries; products are >>>15 with saturation.
 The loop-phase rotator carries unit vectors (cos/sin as Q1.15 written by
@@ -100,7 +100,7 @@ is a roadmap item.
 | 0x00 | ID | RO | 0x11F0_0001 (LLRF, v0.1) |
 | 0x04 | CTRL | RW | b0 run, b1 mode (0 CW / 1 pulsed), b2 fb_en, b3 ext_trig_en |
 | 0x08 | STATUS | RO | b0 rf_gate, b1 fb_gate live; b8/b9 sticky I/Q drive-sat flags (cleared by CTRL write) |
-| 0x0C | DECIM | RW | N, log2 post-mean decimation (0..12) |
+| 0x0C | DECIM | RW | N, log2 post-mean decimation (clamped to 2..12 - the PI engine takes 3 cycles per strobe) |
 | 0x10 | SP_I | RW | setpoint I, Q1.15 |
 | 0x14 | SP_Q | RW | setpoint Q |
 | 0x18 | KP | RW | proportional gain, Q1.15 |

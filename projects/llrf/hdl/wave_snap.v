@@ -2,8 +2,8 @@
 
 // Waveform recorder for diagnostics - module 24's axis_snap_iq, grown
 // two features for LLRF duty:
-//   - parametrizable beat width (the ADC stream is 256-bit, the DAC
-//     drive stream 128-bit; the buffer readout geometry adapts),
+//   - parametrizable beat width (both tile-2 streams happen to be
+//     256-bit today; the buffer readout geometry adapts to DATA_W),
 //   - hardware trigger arming: with CTRL.b1 set, every pulse_gen trigger
 //     re-arms the capture, so the buffer always holds the most recent
 //     pulse - clear b1 and the last pulse stays frozen for readout.

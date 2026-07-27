@@ -59,9 +59,21 @@ SMA: DAC_A -> ADC_A. UART 115200 shows the calibration line, the ASCII
 spectrum for the +240 MHz tone, the sweep table, and one final
 PASS/FAIL.
 
+## Known issue - fix before the bench run
+
+Found while building `projects/llrf` on the same RFDC configuration:
+the instantiated RFDC's DAC fabric stream (`s20_axis`) is **256-bit**
+(8 complex samples per beat at 2457.6 Mcplx/s), but `dds_hls` emits
+128-bit beats - the BD connects them with a width-mismatch critical
+warning (`BD 41-237`), leaving the top half of every DAC beat undriven,
+and `main.c`'s `DAC_BB_MSPS 1228.8` is a factor of 2 low for phase_inc
+math. Cosim never sees this (it checks the kernel, not the BD), so it
+survived to here. Fix when this module gets its bench session: widen
+the DDS to 256-bit (8 samples/beat), set `DAC_BB_MSPS 2457.6`, rebuild.
+
 ## Board status
 
 | Board | Status |
 |---|---|
-| rfsoc4x2 | bitstream + xsa + elf build; bench run pending (SMA loopback) |
+| rfsoc4x2 | bitstream + xsa + elf build; bench run pending (SMA loopback, after the known-issue fix above) |
 | nexys4 / blackboard | n/a - no RF data converters |

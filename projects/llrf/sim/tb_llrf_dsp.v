@@ -102,12 +102,14 @@ module tb_llrf_dsp;
         check("rot_q", rot_q, 16384, 2);
 
         // ---- PI proportional: e=1000, kp=0.5 -> drive 500 ----
+        // (pi_ctrl is a 3-cycle engine: strobe -> multiply -> execute;
+        // strobes need >= 3 idle cycles between them or they're dropped)
         @(negedge clk);
         p_run = 1; p_fb_en = 1; p_gate = 1;
         p_sp = 1000; p_meas = 0; p_kp = 16384; p_ki = 0;
         @(negedge clk) p_str = 1;
         @(negedge clk) p_str = 0;
-        repeat (2) @(posedge clk);
+        repeat (4) @(posedge clk);
         check("pi P-only", p_drv, 500, 1);
 
         // ---- PI integral: ki=0.1, ten strobes -> +100/strobe on top ----
@@ -115,8 +117,9 @@ module tb_llrf_dsp;
         for (k = 0; k < 10; k = k + 1) begin
             @(negedge clk) p_str = 1;
             @(negedge clk) p_str = 0;
+            repeat (3) @(negedge clk);
         end
-        repeat (2) @(posedge clk);
+        repeat (4) @(posedge clk);
         // drive on the 10th strobe sees the accumulator from the first 9
         // integrations (u is computed before acc updates): 500 + 9*100
         check("pi P+I", p_drv, 1400, 20);
@@ -127,8 +130,9 @@ module tb_llrf_dsp;
         for (k = 0; k < 5; k = k + 1) begin
             @(negedge clk) p_str = 1;
             @(negedge clk) p_str = 0;
+            repeat (3) @(negedge clk);
         end
-        repeat (2) @(posedge clk);
+        repeat (4) @(posedge clk);
         check("pi clamp", p_drv, 600, 0);
         if (sat_seen == 0) begin
             $display("FAIL: saturation never flagged");
@@ -141,7 +145,7 @@ module tb_llrf_dsp;
         @(negedge clk) p_run = 1; p_lim = 16'd32767; p_ki = 0;
         @(negedge clk) p_str = 1;
         @(negedge clk) p_str = 0;
-        repeat (2) @(posedge clk);
+        repeat (4) @(posedge clk);
         check("pi after clear", p_drv, 500, 1);
 
         if (errors == 0) $display("PASS: tb_llrf_dsp (all checks)");

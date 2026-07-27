@@ -62,9 +62,10 @@ module llrf_core (
     (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 s_axis TREADY" *)
     output             s_axis_tready,
 
-    // cavity drive, to the RFDC DAC (4 {Q,I} pairs per beat)
+    // cavity drive, to the RFDC DAC (8 {Q,I} pairs per 256-bit beat -
+    // the width the instantiated RFDC actually presents on s20_axis)
     (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TDATA" *)
-    output     [127:0] m_axis_tdata,
+    output     [255:0] m_axis_tdata,
     (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TVALID" *)
     output             m_axis_tvalid,
     (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TREADY" *)
@@ -143,8 +144,8 @@ module llrf_core (
         .sp(r_sp_q), .kp(r_kp), .ki(r_ki), .ff(r_ff_q), .lim(r_lim),
         .meas(rot_q), .strobe(rot_v), .drive(drv_q), .sat_evt(sat_q));
 
-    // drive replicated into all four beat lanes, gated by rf_gate
-    assign m_axis_tdata = (ctrl_run && rf_gate) ? {4{drv_q, drv_i}} : 128'h0;
+    // drive replicated into all eight beat lanes, gated by rf_gate
+    assign m_axis_tdata = (ctrl_run && rf_gate) ? {8{drv_q, drv_i}} : 256'h0;
 
     // sticky saturation flags, cleared by any CTRL write
     reg sat_i_st = 1'b0, sat_q_st = 1'b0;
@@ -205,7 +206,10 @@ module llrf_core (
                         sat_i_st <= 1'b0;              // CTRL write clears
                         sat_q_st <= 1'b0;
                     end
-                    6'h03: r_decim  <= (wdata_l[3:0] > 4'd12) ? 4'd12
+                    // floor of 2: pi_ctrl is a 3-cycle engine, so strobes
+                    // closer than 4 cycles apart would be dropped anyway
+                    6'h03: r_decim  <= (wdata_l[3:0] > 4'd12) ? 4'd12 :
+                                       (wdata_l[3:0] < 4'd2)  ? 4'd2
                                                               : wdata_l[3:0];
                     6'h04: r_sp_i   <= wdata_l[15:0];
                     6'h05: r_sp_q   <= wdata_l[15:0];

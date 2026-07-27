@@ -30,7 +30,7 @@ module tb_llrf_loop;
     reg         c_rready = 1;
 
     reg  [255:0] adc_beat = 0;
-    wire [127:0] dac_beat;
+    wire [255:0] dac_beat;
     wire trig_out;
     wire [3:0] led;
 
@@ -53,7 +53,7 @@ module tb_llrf_loop;
     wire [31:0] s_rdata;       wire [1:0] s_rresp; wire s_rvalid;
     reg         s_rready = 1;
 
-    wave_snap #(.DATA_W(128), .DEPTH_LOG2(10), .ID_VALUE(32'hACE0_11F1))
+    wave_snap #(.DATA_W(256), .DEPTH_LOG2(10), .ID_VALUE(32'hACE0_11F1))
     u_snap (
         .aclk(clk), .aresetn(rstn),
         .s_axil_awaddr(s_awaddr), .s_axil_awvalid(s_awvalid), .s_axil_awready(s_awready),
@@ -237,8 +237,8 @@ module tb_llrf_loop;
         end
         // beat 0 (t=0, before DELAY): zero. beat 600 (t=600, gate open,
         // capture is beat-per-cycle here since tvalid is constant): nonzero.
-        sread(32'h8000 + 0 * 16, rd);
-        sread(32'h8000 + 600 * 16, rd2);
+        sread(32'h8000 + 0 * 32, rd);
+        sread(32'h8000 + 600 * 32, rd2);
         if (rd !== 32'h0) begin
             $display("FAIL: snap beat0 %08x (want 0 - pre-gate)", rd);
             errors = errors + 1;
