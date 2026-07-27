@@ -143,8 +143,13 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   back to 100 MHz, new axis_snap BRAM recorder + zero-crossing frequency
   measurement in C. bitstream+xsa+elf green; bench run needs an SMA cable
   (DAC_A -> ADC_A).
-- [ ] `23_digital_up_down_conversion` - NCOs, mixers, decimation/interpolation
-  on the RFDC tiles.
+- [x] `23_digital_up_down_conversion` - same bitstream as 22, radio
+  reconfigured at runtime (the lesson itself): fine-NCO sweep tracks
+  |f_carrier - f_nco| row by row (with the negative-frequency fold a
+  single component can't resolve), coarse fs/4 mixer (multiply-free:
+  1,-j,-1,j), runtime decimation 2x->4x showing "wrong math reads 200MHz,
+  rate-aware math reads 100MHz again". bitstream+xsa+elf green; bench
+  run pending SMA loopback.
 - [ ] `24_software_defined_radio_mini_project` - a small end-to-end SDR
   exercise combining Tiers 7-8 (e.g. a tone generator + spectrum viewer, or a
   simple AM/FM demod).
