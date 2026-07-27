@@ -115,10 +115,25 @@ license, or AMD account - see `docs/tool_setup.md`.)*
   `gen-machineconf parse-sdt` (SDT -> Yocto MACHINE, including FSBL/PMU
   multiconfigs) -> `bitbake`. Chain proven end to end for rfsoc4x2; first
   image build in progress.
-- [ ] `17_device_trees_and_drivers` - wiring a custom PL peripheral into the
-  device tree; a minimal kernel module or UIO-based userspace driver.
-- [ ] `18_linux_userspace_apps` - talking to hardware from Python/C on Linux
-  (mmap'd registers, `/dev/uio*`).
+- [x] `17_device_trees_and_drivers` - module 15's `axil_regs`, unchanged,
+  meets the kernel: sdtgen turns the BD address map into a `pl.dtsi` node
+  (`compatible = "xlnx,axil-regs-1.0"`, verified on both boards), and
+  `uio_pdrv_genirq of_id=` binds it WITHOUT falsifying the compatible to
+  `generic-uio`. New repo-side Yocto layer `linux/meta-fpgalab` (opt-in
+  bootargs dtsi via the device-tree recipe's `EXTRA_DT_INCLUDE_FILES`
+  hook). Userspace UIO driver in C, address discovered through sysfs, no
+  hardcoded base anywhere. Cross-compiled with the Linux toolchains that
+  ship inside Vitis. (On-target run pending module 16's image - bench.)
+- [x] `18_linux_userspace_apps` - hardware as an ordinary programming
+  target: `Uio`/`DevMem`/`dt_find` in pure-stdlib Python (reg base decoded
+  from `/proc/device-tree` with the parent's cell sizes - <1,1> zynq vs
+  <2,2> zynqmp, host-verified on both geometries), module 15's demo from
+  Python, `/dev/mem` C twin as the cautionary tale, and the payoff:
+  module 24's SDR from a shell prompt (`sdr_capture.py 240 -240 480`) -
+  DDS tone, snap capture, pure-Python FFT host-verified on module 24's
+  exact tone set. `meta-fpgalab` grows app recipes + `fpgalab-image`
+  (minimal + python3 + our tools). (Recipes' first bitbake queued behind
+  module 16's build; on-target runs are bench items.)
 
 ## Tier 7 - High-level synthesis & DSP
 
