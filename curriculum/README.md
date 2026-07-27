@@ -162,8 +162,14 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
 
 ## Tier 9 - High-speed I/O & networking
 
-- [ ] `25_gigabit_ethernet` - GEM/RGMII on the Zynq PS, a simple Linux or
-  bare-metal networked app.
+- [x] `25_gigabit_ethernet` - GEM1 + DP83867 over MIO on RFSoC4x2 (the
+  one board here with Ethernet), bare-metal lwIP RAW-mode TCP echo
+  server: the stack as a library - main loop pumps xemacif_input(),
+  a 50ms xiltimer tick drives tcp_fasttmr/slowtmr (skip that and TCP
+  dies on the first lost packet), connections are callbacks. New
+  BSP_LIBS knob in vitis.mk/build_app.py (domain.set_lib). Static
+  192.168.1.10, ping + nc port 7. bitstream+xsa+elf green; bench run
+  pending an Ethernet cable.
 - [ ] `26_high_speed_serial_intro` - GTY transceivers on RFSoC4x2 conceptually
   (QSFP28), what a serial link bring-up actually involves.
 - [ ] `27_pmod_and_syzygy_peripherals` - a real off-board peripheral over

@@ -14,6 +14,8 @@ APP_NAME ?= $(PROJ_NAME)_app
 CPU      ?= ps7_cortexa9_0
 SRC_DIR  ?= src
 XSA      ?= $(XSA_FILE)
+# Optional comma-separated BSP libraries (e.g. lwip220), see build_app.py.
+BSP_LIBS ?=
 
 VITIS_WS := $(OUT_DIR)/$(BOARD)/vitis_ws
 ELF      := $(VITIS_WS)/$(APP_NAME)/build/$(APP_NAME).elf
@@ -24,7 +26,7 @@ elf: $(ELF)
 
 $(ELF): $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.h) $(XSA)
 	@if [ ! -f "$(XSA)" ]; then echo "ERROR: XSA not found: $(XSA) - run 'make BOARD=$(BOARD) xsa' first"; exit 1; fi
-	$(VITIS_RUN) -s $(COMMON_TCL_DIR)/build_app.py "$(VITIS_WS)" "$(APP_NAME)" "$(XSA)" "$(CPU)" "$(SRC_DIR)"
+	$(VITIS_RUN) -s $(COMMON_TCL_DIR)/build_app.py "$(VITIS_WS)" "$(APP_NAME)" "$(XSA)" "$(CPU)" "$(SRC_DIR)" "$(BSP_LIBS)"
 	@echo "ELF: $(ELF)"
 
 clean-vitis:

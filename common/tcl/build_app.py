@@ -2,8 +2,10 @@
 # shared by every Zynq/RFSoC software module. XSCT is disabled in 2026.1 -
 # this is the scripted path now (UG1400).
 #
-# Usage: vitis -s build_app.py <workspace> <app_name> <xsa> <cpu> <src_dir>
+# Usage: vitis -s build_app.py <workspace> <app_name> <xsa> <cpu> <src_dir> [bsp_libs]
 #   cpu: ps7_cortexa9_0 (BlackBoard) | psu_cortexa53_0 (RFSoC4x2)
+#   bsp_libs: optional comma-separated BSP libraries to enable in the
+#             platform domain (e.g. "lwip220" for module 25)
 #
 # Strategy notes:
 #  - The platform (BSP) is regenerated from the XSA every time - it is a
@@ -20,6 +22,7 @@ import sys
 import vitis
 
 ws, app_name, xsa, cpu, src_dir = sys.argv[1:6]
+bsp_libs = sys.argv[6] if len(sys.argv) > 6 else ""
 ws = os.path.abspath(ws)
 xsa = os.path.abspath(xsa)
 src_dir = os.path.abspath(src_dir)
@@ -34,6 +37,10 @@ client = vitis.create_client(workspace=ws)
 
 plat = client.create_platform_component(
     name=plat_name, hw_design=xsa, os="standalone", cpu=cpu)
+if bsp_libs:
+    dom = plat.get_domain(name=domain)
+    for lib in bsp_libs.split(","):
+        dom.set_lib(lib)
 plat.build()
 xpfm = os.path.join(ws, plat_name, "export", plat_name, f"{plat_name}.xpfm")
 
