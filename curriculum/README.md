@@ -135,8 +135,14 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
 
 ## Tier 8 - RF data converters (RFSoC4x2)
 
-- [ ] `22_rf_dc_intro` - the RFDC IP, configuring ADC/DAC tiles, loopback
-  test between a DAC and ADC channel over SMA.
+- [x] `22_rf_dc_intro` - the RFDC IP bare-metal: the LMK04828/LMX2594
+  clock chain programmed over PS SPI0 (register dumps vendored from the
+  official RFSoC-PYNQ repo - without this the tiles never leave reset),
+  tile-2 pair (DAC_A/ADC_A SMAs) at 4.9152 GSPS with on-tile PLLs, DC +
+  fine-mixer NCO = 1 GHz carrier with zero fabric DSP, ADC NCO brings it
+  back to 100 MHz, new axis_snap BRAM recorder + zero-crossing frequency
+  measurement in C. bitstream+xsa+elf green; bench run needs an SMA cable
+  (DAC_A -> ADC_A).
 - [ ] `23_digital_up_down_conversion` - NCOs, mixers, decimation/interpolation
   on the RFDC tiles.
 - [ ] `24_software_defined_radio_mini_project` - a small end-to-end SDR

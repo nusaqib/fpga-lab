@@ -25,6 +25,7 @@ clone https://github.com/Digilent/digilent-xdc.git digilent-xdc
 clone https://github.com/Digilent/vivado-boards.git vivado-boards
 clone https://github.com/RealDigitalOrg/RFSoC4x2-BSP.git RFSoC4x2-BSP
 clone https://github.com/RealDigitalOrg/linux-blackboard.git linux-blackboard
+clone https://github.com/Xilinx/RFSoC-PYNQ.git RFSoC-PYNQ
 
 echo
 echo "Fetched into: $SCRATCH"
@@ -41,6 +42,11 @@ cp -r "$SCRATCH/vivado-boards/new/board_files/nexys4/B.1" "$REPO/boards/nexys4/b
 # RFSoC4x2
 cp "$SCRATCH/RFSoC4x2-BSP/hw/constraints/"*.xdc "$REPO/boards/rfsoc4x2/xdc/"
 cp -r "$SCRATCH/RFSoC4x2-BSP/board_files/rfsoc4x2/1.0" "$REPO/boards/rfsoc4x2/board_files/rfsoc4x2/"
+# RF clock chip (LMK04828 + LMX2594) TICS register dumps, from the official
+# PYNQ board repo - these are what the PYNQ image itself programs at boot.
+cp "$SCRATCH/RFSoC-PYNQ/boards/RFSoC4x2/petalinux_bsp/meta-user/recipes-apps/xrfclk-tics/files/LMK04828_245.76.txt" \
+   "$SCRATCH/RFSoC-PYNQ/boards/RFSoC4x2/petalinux_bsp/meta-user/recipes-apps/xrfclk-tics/files/LMX2594_491.52.txt" \
+   "$REPO/boards/rfsoc4x2/rfclk/"
 
 # BlackBoard (Rev. D)
 cp "$SCRATCH/linux-blackboard/hw/blackboard_revd.xdc" "$REPO/boards/blackboard/xdc/BlackBoard-RevD-Master.xdc"
