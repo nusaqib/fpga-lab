@@ -16,10 +16,14 @@ set clk [create_bd_port -dir I -type clk -freq_hz 100000000 clk100]
 set rstn [create_bd_port -dir I -type rst cpu_resetn]
 set_property CONFIG.POLARITY ACTIVE_LOW $rstn
 
+# Config vocabulary from Xilinx's own MicroBlaze_V_Design_Presets CED
+# (the classic-MicroBlaze values like "Debug Only" are invalid here -
+# the RISC-V rule wants "Debug Enabled" and a "preset" key).
 set mbv [create_bd_cell -type ip -vlnv xilinx.com:ip:microblaze_riscv microblaze_riscv_0]
 apply_bd_automation -rule xilinx.com:bd_rule:microblaze_riscv -config { \
-    local_mem "128KB" ecc "None" cache "None" debug_module "Debug Only" \
-    axi_periph "Enabled" axi_intc "1" clk "/clk100 (100 MHz)" } $mbv
+    preset {Microcontroller} local_mem {128KB} ecc {None} cache {None} \
+    debug_module {Debug Enabled} axi_periph {Enabled} axi_intc {1} \
+    clk {/clk100 (100 MHz)} } $mbv
 
 # wire the button into whatever reset block the automation created
 set rst_cell [get_bd_cells -quiet -filter {VLNV =~ "*proc_sys_reset*"}]
@@ -40,7 +44,8 @@ foreach periph {axi_uartlite_0 axi_gpio_led axi_gpio_sw axi_timer_0} {
     apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config \
         [list Clk_master {/clk100 (100 MHz)} Clk_slave {Auto} Clk_xbar {Auto} \
               Master "/microblaze_riscv_0 (Periph)" Slave "/$periph/S_AXI" \
-              ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}]
+              ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}] \
+        [get_bd_intf_pins /$periph/S_AXI]
 }
 
 # --- interrupts: timer + uart into the intc the automation created ---

@@ -207,9 +207,15 @@ Status legend: `[ ]` not started, `[x]` done, `[~]` in progress.
   deliberately omitted: Pmod signal voltage unverified (LVCMOS18 bank,
   3.3V connector Vdd, manual silent on shifting) - volts obey the same
   truthfulness rule as pins. Sims green; both bitstreams build.
-- [ ] `30_capstone` - open-ended, defined once we get here based on what's
-  most interesting by then (candidates: a PYNQ-style overlay workflow on
-  RFSoC4x2, a soft-core RISC-V on Nexys4, a real SDR application).
+- [x] `30_capstone_riscv_soc` - of the three floated candidates, the
+  non-Linux one (PYNQ overlays belong after Tier 6; the SDR app
+  effectively happened in module 24): a complete RISC-V SoC in the
+  Nexys4's fabric. MicroBlaze-V + 128KB BRAM + UART/GPIO/timer/intc,
+  the same `make elf` flow as module 14 now emitting a UCB RISC-V
+  executable for a CPU that didn't exist before synthesis. The software
+  is a monitor shell (peek/poke the AXI map by hand, mirror sw->led "as
+  an app" - module 00 with a computer in between) with a timer-ISR
+  heartbeat on led[15]. bitstream+xsa+elf green; bench run = the shell.
 
 ---
 

@@ -125,7 +125,7 @@ int main(void)
                        XTC_INT_MODE_OPTION | XTC_AUTO_RELOAD_OPTION);
     XTmrCtr_SetResetValue(&tmr, 0, 0xFFFFFFFF - (XPAR_AXI_TIMER_0_CLOCK_FREQUENCY / TICK_HZ));
     if (XSetupInterruptSystem(&tmr, XTmrCtr_InterruptHandler,
-                              tmr.Config.IntId, tmr.Config.IntrParent,
+                              tmr.Config.IntrId, tmr.Config.IntrParent,
                               XINTERRUPT_DEFAULT_PRIORITY) != XST_SUCCESS) {
         xil_printf("interrupt setup failed\r\n");
         return 1;
