@@ -68,6 +68,18 @@ gui: $(XPR)
 program: $(BIT)
 	$(VIVADO) -mode batch $(VIVADO_LOG_ARGS) -source $(COMMON_TCL_DIR)/program.tcl -tclargs $(BIT)
 
+# License-free programming: xsdb + hw_server need no Vivado license, and
+# this target deliberately does NOT depend on $(BIT) - it programs the
+# bitstream that already exists instead of trying to rebuild first (a
+# rebuild needs the license and may not be what a bench session wants).
+# Discovered the day the node-locked license dongle flaked mid-bench;
+# `make program` (Vivado hardware manager) remains the standard path.
+XSDB := bash -c 'source $(VITIS_SETTINGS) && exec xsdb "$$@"' xsdb
+.PHONY: program-xsdb
+program-xsdb:
+	@if [ ! -f "$(BIT)" ]; then echo "ERROR: no bitstream at $(BIT) - run 'make BOARD=$(BOARD) bitstream' first"; exit 1; fi
+	$(XSDB) -eval "connect; after 2000; fpga -file $(abspath $(BIT)); puts PROGRAMMED"
+
 # Hardware platform export for Vitis (Tier 5+): builds the bitstream if
 # needed, then writes <module>_<board>.xsa next to the project.
 XSA_FILE := $(VIVADO_PROJ_DIR)/$(PROJ_NAME)_$(BOARD).xsa

@@ -112,7 +112,10 @@ make BOARD=rfsoc4x2 bitstream
 
 Other targets: `make synth` (synthesis only), `make gui` (open the generated
 `.xpr` in the Vivado GUI), `make program` (push the bitstream over JTAG),
-`make clean` (delete `_out/`), `make board-info` (print resolved variables).
+`make program-xsdb` (same, via xsdb/hw_server: needs NO Vivado license and
+programs the existing `.bit` without triggering a rebuild - the bench-day
+path when the node-locked license is unavailable), `make clean` (delete
+`_out/`), `make board-info` (print resolved variables).
 
 ## Why project-mode, not pure non-project batch mode
 
